@@ -1,0 +1,25 @@
+Anleitung die Hardware anzuschließen
+pberry
+Den Raspberry Pi per Lan Kabel
+
+Raspberry PI5 Befehle 
+
+Connection:
+ssh parkourcode@192.168.137.10
+
+Remote Desktop:
+sudo raspi-config
+arp-as
+sudo shutdown -h now
+
+Ressourcen auf den PI 5 laden:
+scp "C:\Users\niv\OneDrive - abat AG\Desktop\PJ2\ParkourCode.py" parkourcode@192.168.137.10:/home/parkourcode/
+
+Passwort und name:
+parkourcode
+
+cd /home/parkourcode/
+
+Skript starten:
+python3 /home/parkourcode/ParkourCode.py
+
