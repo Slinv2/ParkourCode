@@ -5,7 +5,6 @@ Anleitung die Hardware anzuschließen:
 4.1 Java Server starten
 4.2 Python Skript starten 
 
-
 Raspberry PI5 Befehle 
 
 Connection:
