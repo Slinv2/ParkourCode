@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parkour Code - Mauzi & Pluto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --dil-blue: #004284;
+            --dil-blue-dark: #002f5f;
+            --dil-blue-soft: #e8f2ff;
+            --parkour-yellow: #ffd166;
+            --mauzi-pink: #ff8fab;
+            --pluto-orange: #ff8a3d;
+            --success-green: #39c77f;
+            --error-red: #ff5c5c;
+            --card-white: #ffffff;
+            --text-dark: #102033;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(180deg, var(--dil-blue) 0%, var(--dil-blue-dark) 100%);
+        }
+        .block { transition: transform 0.2s, box-shadow 0.2s; }
+        .block:hover { transform: scale(1.05); }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .bounce-slow { animation: bounce 2s infinite; }
+        @keyframes gentleWiggle {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-3px); }
+            75% { transform: translateX(3px); }
+        }
+        .animate-wiggle {
+            animation: gentleWiggle 0.5s ease-in-out;
+            animation-iteration-count: 3;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div id="app"></div>
+
+    <script>
+        // --- TRANSLATIONS ---
+        const translations = {
+            en: {
+                appTitle: "Parkour Code",
+                playNow: "Let's play!",
+                pickMission: "Choose your mission!",
+                eachMission: "Each mission teaches you something new!",
+                easy: "Easy",
+                medium: "Medium",
+                hard: "Hard",
+                waitActions: "All Actions",
+                myProgram: "My Program",
+                checkCode: "Check Code",
+                mauziAide: "Mauzi's Help",
+                waitingForYou: "Waiting for your actions...",
+                parkourStart: "Start the parkour!",
+                parkourRunning: "Parkour is running!",
+                legosOnWay: "The Legos are on their way!",
+                testUs: "Test for us",
+                mauziSafe: "Mauzi is safe!",
+                didIt: "You did it! You just learned how a program works!",
+                again: "Play again",
+                otherMission: "Another mission",
+                missionStart: "Mission started! Let's go!",
+                actionAdded: "Action added:",
+                actionRemoved: "Action removed:",
+                errorWrongPath: "Wrong path! Look for:",
+                successParkourDone: "Parkour complete! Mauzi is safe!",
+                removeWrongBlock: "👉 Tip: Remove the wrong block above!",
+                oops: "Oops!",
+                mission1Title: "Help Mauzi wake up!",
+                mission1Story: "Mauzi is fast asleep. Pluto is approaching! Arrange the actions in the correct order to wake her up.",
+                mission2Title: "Defend against Pluto!",
+                mission2Story: "Mauzi is awake! Now she needs light and music to chase Pluto away!",
+                mission3Title: "Security for Mauzi!",
+                mission3Story: "Perfect! Now activate the shield so Pluto never comes back!",
+                hint1a: "🐱 Zzz... Mauzi is still asleep! Tip: Start with 'Eyes Open'!",
+                hint1b: "👀 Mauzi has her eyes open! Next, she needs to 'Stand Up'!",
+                hint1c: "🧍 Wow, Mauzi is standing! Now she can 'Wave'!",
+                hint2a: "🐱 Zzz... Mauzi is asleep! Start with 'Eyes Open'!",
+                hint2b: "👀 Perfect! Now Mauzi needs to 'Stand Up'!",
+                hint2c: "🧍 Great! Now turn the 'Light On'!",
+                hint2d: "💡 Wow! Finally, turn on the 'Music' so Pluto hears it!",
+                hint3a: "🐱 Zzz... First, 'Eyes Open'!",
+                hint3b: "👀 Great! Next, 'Stand Up'!",
+                hint3c: "🧍 Perfect! Now 'Wave'!",
+                hint3d: "👋 Wow! Turn the 'Light On'!",
+                hint3e: "💡 Perfect! Then, 'Music'!",
+                hint3f: "🎵 Almost there! Finally, the 'Shield'!",
+                eyesOpen: "Eyes Open",
+                standUp: "Stand Up",
+                wave: "Wave",
+                lightOn: "Light On",
+                music: "Music",
+                shield: "Shield",
+                buttonA: "Press the Yellow Button",
+                buttonB: "Press the Blue Button",
+                lichtschrankeA: "Go through the First Light Barrier",
+                gewicht: "Put the Weight On",
+                lichtschrankeB: "Go through the Second Light Barrier",
+                licht: "Activate the Light",
+            },
+            de: {
+                appTitle: "Parkour Code",
+                playNow: "Spielen wir!",
+                pickMission: "Wähle deine Mission!",
+                eachMission: "Jede Mission lehrt dich etwas Neues!",
+                easy: "Einfach",
+                medium: "Mittel",
+                hard: "Schwer",
+                waitActions: "Alle Aktionen",
+                myProgram: "Mein Programm",
+                checkCode: "Code prüfen",
+                mauziAide: "Mauzi's Hilfe",
+                waitingForYou: "Warte auf deine Aktionen...",
+                parkourStart: "Parcours starten!",
+                parkourRunning: "Parcours läuft!",
+                legosOnWay: "Die Legos sind unterwegs!",
+                testUs: "Test für uns",
+                mauziSafe: "Mauzi ist sicher!",
+                didIt: "Du hast es geschafft! Du hast gerade gelernt, wie ein Programm funktioniert!",
+                again: "Nochmal spielen",
+                otherMission: "Andere Mission",
+                missionStart: "Mission gestartet! Los geht's!",
+                actionAdded: "Aktion hinzugefügt:",
+                actionRemoved: "Aktion entfernt:",
+                errorWrongPath: "Falscher Weg! Suche nach:",
+                successParkourDone: "Parcours abgeschlossen! Mauzi ist sicher!",
+                removeWrongBlock: "👉 Tipp: Entferne den falschen Block oben!",
+                oops: "Oops!",
+                mission1Title: "Hilf Mauzi aufzuwachen!",
+                mission1Story: "Mauzi schläft tief. Pluto nähert sich! Bringe die Aktionen in die richtige Reihenfolge, um sie aufzuwecken.",
+                mission2Title: "Wehre Pluto ab!",
+                mission2Story: "Mauzi ist wach! Jetzt braucht sie Licht und Musik, um Pluto zu vertreiben.",
+                mission3Title: "Sicherheit für Mauzi!",
+                mission3Story: "Perfekt! Jetzt aktiviert den Schutzschild, damit Pluto nie mehr zurückkommt!",
+                hint1a: "🐱 Zzz... Mauzi schläft noch! Tipp: Fange mit 'Augen auf' an!",
+                hint1b: "👀 Mauzi hat die Augen offen! Als Nächstes braucht sie 'Aufstehen'!",
+                hint1c: "🧍 Wow, Mauzi steht! Jetzt kann sie 'Winken'!",
+                hint2a: "🐱 Zzz... Mauzi schläft! Fange mit 'Augen auf' an!",
+                hint2b: "👀 Perfekt! Jetzt braucht Mauzi 'Aufstehen'!",
+                hint2c: "🧍 Super! Mach doch mal 'Licht an'!",
+                hint2d: "💡 Wow! Abschließend kommt 'Musik', damit Pluto hört!",
+                hint3a: "🐱 Zzz... Erst mal 'Augen auf'!",
+                hint3b: "👀 Toll! Als Nächstes 'Aufstehen'!",
+                hint3c: "🧍 Super! Jetzt 'Winken'!",
+                hint3d: "👋 Wow! Mach 'Licht an'!",
+                hint3e: "💡 Perfekt! Dann 'Musik'!",
+                hint3f: "🎵 Fast fertig! Zuletzt 'Schutzschild'!",
+                eyesOpen: "Augen auf",
+                standUp: "Aufstehen",
+                wave: "Winken",
+                lightOn: "Licht an",
+                music: "Musik",
+                shield: "Schutzschild",
+                buttonA: "Drücke den gelben Knopf",
+                buttonB: "Drücke den blauen Knopf",
+                lichtschrankeA: "Fahre durch die erste Lichtschranke",
+                gewicht: "Stelle das Gewicht drauf",
+                lichtschrankeB: "Fahre durch die zweite Lichtschranke",
+                licht: "Aktiviere das Licht",
+            }
+        };
+
+        // --- MISSIONS ---
+        function getMissionData(lang) {
+            return [
+                {
+                    id: "aufwecken-einfach",
+                    level: "easy",
+                    title: lang === "de" ? translations.de.mission1Title : translations.en.mission1Title,
+                    story: lang === "de" ? translations.de.mission1Story : translations.en.mission1Story,
+                    blocks: [
+                        { id: "augen-auf", label: lang === "de" ? translations.de.eyesOpen : translations.en.eyesOpen, icon: "👀", color: "#ff8fab" },
+                        { id: "aufstehen", label: lang === "de" ? translations.de.standUp : translations.en.standUp, icon: "🧍", color: "#60a5fa" },
+                        { id: "winken", label: lang === "de" ? translations.de.wave : translations.en.wave, icon: "👋", color: "#39c77f" },
+                    ],
+                    correctSequence: ["augen-auf", "aufstehen", "winken"],
+                    hints: {
+                        "augen-auf": lang === "de" ? translations.de.hint1a : translations.en.hint1a,
+                        "aufstehen": lang === "de" ? translations.de.hint1b : translations.en.hint1b,
+                        "winken": lang === "de" ? translations.de.hint1c : translations.en.hint1c,
+                    },
+                    hardwareMission: [
+                        { id: "button-a", label: lang === "de" ? translations.de.buttonA : translations.en.buttonA, sensor: "button-a" },
+                        { id: "lichtschranke-a", label: lang === "de" ? translations.de.lichtschrankeA : translations.en.lichtschrankeA, sensor: "lichtschranke-a" },
+                    ],
+                },
+                {
+                    id: "verteidigung-mittel",
+                    level: "mid",
+                    title: lang === "de" ? translations.de.mission2Title : translations.en.mission2Title,
+                    story: lang === "de" ? translations.de.mission2Story : translations.en.mission2Story,
+                    blocks: [
+                        { id: "augen-auf", label: lang === "de" ? translations.de.eyesOpen : translations.en.eyesOpen, icon: "👀", color: "#ff8fab" },
+                        { id: "aufstehen", label: lang === "de" ? translations.de.standUp : translations.en.standUp, icon: "🧍", color: "#60a5fa" },
+                        { id: "licht-an", label: lang === "de" ? translations.de.lightOn : translations.en.lightOn, icon: "💡", color: "#ffd166" },
+                        { id: "musik", label: lang === "de" ? translations.de.music : translations.en.music, icon: "🎵", color: "#a78bfa" },
+                    ],
+                    correctSequence: ["augen-auf", "aufstehen", "licht-an", "musik"],
+                    hints: {
+                        "augen-auf": lang === "de" ? translations.de.hint2a : translations.en.hint2a,
+                        "aufstehen": lang === "de" ? translations.de.hint2b : translations.en.hint2b,
+                        "licht-an": lang === "de" ? translations.de.hint2c : translations.en.hint2c,
+                        "musik": lang === "de" ? translations.de.hint2d : translations.en.hint2d,
+                    },
+                    hardwareMission: [
+                        { id: "button-a", label: lang === "de" ? translations.de.buttonA : translations.en.buttonA, sensor: "button-a" },
+                        { id: "button-b", label: lang === "de" ? translations.de.buttonB : translations.en.buttonB, sensor: "button-b" },
+                        { id: "gewicht", label: lang === "de" ? translations.de.gewicht : translations.en.gewicht, sensor: "gewicht" },
+                    ],
+                },
+                {
+                    id: "sicherheit-schwer",
+                    level: "hard",
+                    title: lang === "de" ? translations.de.mission3Title : translations.en.mission3Title,
+                    story: lang === "de" ? translations.de.mission3Story : translations.en.mission3Story,
+                    blocks: [
+                        { id: "augen-auf", label: lang === "de" ? translations.de.eyesOpen : translations.en.eyesOpen, icon: "👀", color: "#ff8fab" },
+                        { id: "aufstehen", label: lang === "de" ? translations.de.standUp : translations.en.standUp, icon: "🧍", color: "#60a5fa" },
+                        { id: "winken", label: lang === "de" ? translations.de.wave : translations.en.wave, icon: "👋", color: "#39c77f" },
+                        { id: "licht-an", label: lang === "de" ? translations.de.lightOn : translations.en.lightOn, icon: "💡", color: "#ffd166" },
+                        { id: "musik", label: lang === "de" ? translations.de.music : translations.en.music, icon: "🎵", color: "#a78bfa" },
+                        { id: "schutz", label: lang === "de" ? translations.de.shield : translations.en.shield, icon: "🛡️", color: "#ff8a3d" },
+                    ],
+                    correctSequence: ["augen-auf", "aufstehen", "winken", "licht-an", "musik", "schutz"],
+                    hints: {
+                        "augen-auf": lang === "de" ? translations.de.hint3a : translations.en.hint3a,
+                        "aufstehen": lang === "de" ? translations.de.hint3b : translations.en.hint3b,
+                        "winken": lang === "de" ? translations.de.hint3c : translations.en.hint3c,
+                        "licht-an": lang === "de" ? translations.de.hint3d : translations.en.hint3d,
+                        "musik": lang === "de" ? translations.de.hint3e : translations.en.hint3e,
+                        "schutz": lang === "de" ? translations.de.hint3f : translations.en.hint3f,
+                    },
+                    hardwareMission: [
+                        { id: "button-a", label: lang === "de" ? translations.de.buttonA : translations.en.buttonA, sensor: "button-a" },
+                        { id: "button-b", label: lang === "de" ? translations.de.buttonB : translations.en.buttonB, sensor: "button-b" },
+                        { id: "lichtschranke-a", label: lang === "de" ? translations.de.lichtschrankeA : translations.en.lichtschrankeA, sensor: "lichtschranke-a" },
+                        { id: "gewicht", label: lang === "de" ? translations.de.gewicht : translations.en.gewicht, sensor: "gewicht" },
+                        { id: "lichtschranke-b", label: lang === "de" ? translations.de.lichtschrankeB : translations.en.lichtschrankeB, sensor: "lichtschranke-b" },
+                        { id: "licht", label: lang === "de" ? translations.de.licht : translations.en.licht, sensor: "licht" },
+                    ],
+                },
+            ];
+        }
+
+        // --- STATE ---
+        let currentLanguage = "de";
+        let phase = "welcome";
+        let currentMissionId = null;
+        let program = [];
+        let validation = null;
+        let hardwareSteps = [];
+        let currentHardwareStepIndex = 0;
+        let consoleLines = [];
+        let missions = getMissionData(currentLanguage);
+
+        // --- FUNCTIONS ---
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            missions = getMissionData(lang);
+            render();
+        }
+
+        function getCurrentMission() {
+            return missions.find(m => m.id === currentMissionId);
+        }
+
+        function addConsoleLine(text, type = "info") {
+            const colors = { info: "text-blue-600", success: "text-green-600", error: "text-red-500" };
+            const time = new Date().toLocaleTimeString(currentLanguage === "de" ? "de-DE" : "en-US", { hour: "2-digit", minute: "2-digit" });
+            consoleLines.push({ text, color: colors[type], time });
+            render();
+        }
+
+        function startGame() {
+            phase = "level-select";
+            render();
+        }
+
+        function selectMission(id) {
+            currentMissionId = id;
+            program = [];
+            validation = null;
+            consoleLines = [];
+            phase = "code-builder";
+            const t = translations[currentLanguage];
+            addConsoleLine(t.missionStart, "info");
+            render();
+        }
+
+        function addBlock(id) {
+            if (validation && !validation.valid) return;
+            
+            if (!program.includes(id)) {
+                const newProgram = [...program, id];
+                program = newProgram;
+                
+                const mission = getCurrentMission();
+                const t = translations[currentLanguage];
+                
+                if (mission) {
+                    const correctSeq = mission.correctSequence;
+                    const index = newProgram.length - 1;
+                    
+                    if (index < correctSeq.length && newProgram[index] !== correctSeq[index]) {
+                        const message = mission.hints[correctSeq[index]];
+                        validation = { valid: false, wrongIndex: index, message };
+                        addConsoleLine(`${t.oops} ${message}`, "error");
+                    } else {
+                        validation = null;
+                        const block = mission.blocks.find(b => b.id === id);
+                        if (block) {
+                            addConsoleLine(`${t.actionAdded} ${block.label}`, "info");
+                        }
+                    }
+                }
+                render();
+            }
+        }
+
+        function removeBlock(index) {
+            const t = translations[currentLanguage];
+            const block = getCurrentMission()?.blocks.find(b => b.id === program[index]);
+            program = program.filter((_, i) => i !== index);
+            validation = null;
+            if (block) {
+                addConsoleLine(`${t.actionRemoved} ${block.label}`, "info");
+            }
+            render();
+        }
+
+        function validateProgram() {
+            const mission = getCurrentMission();
+            if (!mission) return;
+            const correctSeq = mission.correctSequence;
+            const t = translations[currentLanguage];
+
+            for (let i = 0; i < program.length; i++) {
+                if (program[i] !== correctSeq[i]) {
+                    const message = mission.hints[correctSeq[i]];
+                    validation = { valid: false, wrongIndex: i, message };
+                    addConsoleLine(`${t.oops} ${message}`, "error");
+                    render();
+                    return;
+                }
+            }
+
+            if (program.length < correctSeq.length) {
+                const message = t.removeWrongBlock.replace("👉", "").trim();
+                validation = { valid: false, wrongIndex: program.length, message };
+                addConsoleLine(message, "error");
+                render();
+                return;
+            }
+
+            validation = { valid: true, wrongIndex: -1, message: "Super!" };
+            addConsoleLine(t.successParkourDone, "success");
+            
+            setTimeout(() => {
+                hardwareSteps = mission.hardwareMission.map((s, i) => ({ ...s, status: i === 0 ? "active" : "pending" }));
+                currentHardwareStepIndex = 0;
+                phase = "hardware-ready";
+                render();
+            }, 1500);
+        }
+
+        function startHardware() {
+            phase = "hardware-running";
+            const t = translations[currentLanguage];
+            addConsoleLine(t.parkourStart, "info");
+            render();
+        }
+
+        function simulateHardwareStep(sensorId) {
+            const mission = getCurrentMission();
+            if (!mission) return;
+            const currentStep = hardwareSteps[currentHardwareStepIndex];
+            const t = translations[currentLanguage];
+
+            if (currentStep.sensor === sensorId) {
+                hardwareSteps = [...hardwareSteps];
+                hardwareSteps[currentHardwareStepIndex].status = "success";
+                addConsoleLine(t.successParkourDone.split(".")[0], "success");
+                
+                if (currentHardwareStepIndex < mission.hardwareMission.length - 1) {
+                    hardwareSteps[currentHardwareStepIndex + 1].status = "active";
+                    currentHardwareStepIndex++;
+                } else {
+                    setTimeout(() => {
+                        addConsoleLine(t.mauziSafe, "success");
+                        phase = "success";
+                        render();
+                    }, 1000);
+                }
+            } else {
+                addConsoleLine(`${t.errorWrongPath} ${currentStep.label}`, "error");
+            }
+            render();
+        }
+
+        function resetGame() {
+            phase = "welcome";
+            currentMissionId = null;
+            program = [];
+            validation = null;
+            hardwareSteps = [];
+            currentHardwareStepIndex = 0;
+            consoleLines = [];
+            render();
+        }
+
+        // --- RENDER HEADER ---
+        function renderHeader() {
+            const t = translations[currentLanguage];
+            return `
+                <div class="bg-white shadow-md px-6 py-4 flex items-center justify-between border-b-4" style="border-color: var(--dil-blue);">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 flex items-center justify-center rounded-lg font-bold text-white" style="background-color: var(--dil-blue);">DIL</div>
+                        <h1 class="text-2xl font-extrabold" style="color: var(--text-dark);">${t.appTitle}</h1>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="setLanguage('de')" class="px-4 py-2 rounded-lg font-semibold transition-all hover:scale-105 ${currentLanguage === 'de' ? 'text-white' : 'text-gray-700'}" style="background-color: ${currentLanguage === 'de' ? 'var(--dil-blue)' : 'var(--dil-blue-soft)'};">🇩🇪 DE</button>
+                        <button onclick="setLanguage('en')" class="px-4 py-2 rounded-lg font-semibold transition-all hover:scale-105 ${currentLanguage === 'en' ? 'text-white' : 'text-gray-700'}" style="background-color: ${currentLanguage === 'en' ? 'var(--dil-blue)' : 'var(--dil-blue-soft)'};">🇬🇧 EN</button>
+                        ${phase !== 'welcome' ? `<button onclick="resetGame()" class="px-4 py-2 rounded-lg font-semibold transition-all hover:scale-105 text-gray-700" style="background-color: var(--dil-blue-soft);">↺ Reset</button>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- RENDERERS ---
+        function renderWelcome() {
+            const t = translations[currentLanguage];
+            return `
+                ${renderHeader()}
+                <div class="flex items-center justify-center px-8 py-12">
+                    <div class="max-w-4xl w-full text-center">
+                        <div class="flex justify-center gap-12 mb-10">
+                            <div class="text-9xl animate-bounce" style="animationDuration: 3s;">🐱</div>
+                            <div class="text-9xl animate-pulse" style="animationDuration: 2s;">🐕</div>
+                        </div>
+                        <h2 class="text-5xl font-extrabold mb-6 text-white">Lerne Programmieren, indem du Mauzi vor Pluto schützt!</h2>
+                        <button onclick="startGame()" class="px-12 py-6 rounded-3xl text-3xl font-extrabold shadow-xl hover:scale-105 transition-all text-white" style="background-color: var(--dil-blue);">
+                            ${t.playNow}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderLevelSelect() {
+            const t = translations[currentLanguage];
+
+            return `
+                ${renderHeader()}
+                <div class="flex items-center justify-center px-8 py-12">
+                    <div class="max-w-6xl w-full">
+                        <h2 class="text-4xl font-extrabold text-center mb-4 text-white">${t.pickMission}</h2>
+                        <p class="text-xl text-center mb-12 text-blue-100">${t.eachMission}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            ${missions.map((m) => `
+                                <button onclick="selectMission('${m.id}')" class="bg-white rounded-3xl p-10 text-left hover:shadow-2xl transition-all hover:-translate-y-2 border-4" style="border-color: var(--dil-blue-soft);">
+                                    <div class="text-6xl mb-4">${m.level === "easy" ? "🌱" : m.level === "mid" ? "🌿" : "🌳"}</div>
+                                    <div class="text-sm uppercase tracking-widest mb-2" style="color: var(--dil-blue);">
+                                        ${m.level === "easy" ? t.easy : m.level === "mid" ? t.medium : t.hard}
+                                    </div>
+                                    <div class="text-2xl font-bold mb-3" style="color: var(--text-dark);">${m.title}</div>
+                                    <div class="text-gray-600">${m.story.substring(0, 80)}...</div>
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCodeBuilder() {
+            const mission = getCurrentMission();
+            if (!mission) return "";
+            const correctSeq = mission.correctSequence;
+            const t = translations[currentLanguage];
+
+            return `
+                ${renderHeader()}
+                ${validation && !validation.valid ? `
+                    <div class="p-5 text-center fade-in" style="background-color: #ff5c5c1a;">
+                        <div class="max-w-4xl mx-auto">
+                            <div class="text-4xl mb-2">🤔</div>
+                            <div class="text-xl font-bold text-red-600">${validation.message}</div>
+                            <div class="text-sm text-red-500 mt-1">${t.removeWrongBlock}</div>
+                        </div>
+                    </div>
+                ` : ''}
+
+                <div class="px-8 py-6">
+                    <div class="max-w-7xl mx-auto bg-white rounded-3xl p-8 shadow-xl">
+                        <h2 class="text-3xl font-extrabold mb-2" style="color: var(--text-dark);">${mission.title}</h2>
+                        <p class="text-lg text-gray-600 mb-8">${mission.story}</p>
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                            <div class="lg:col-span-3">
+                                <h3 class="text-xl font-bold mb-4 flex items-center gap-2" style="color: var(--text-dark);">🧱 ${t.waitActions}</h3>
+                                <div class="space-y-4">
+                                    ${mission.blocks.map((b) => {
+                                        const isAdded = program.includes(b.id);
+                                        const hasError = validation && !validation.valid;
+                                        const isClickable = !isAdded && !hasError;
+                                        return `
+                                            <div
+                                                onclick="${isClickable ? `addBlock('${b.id}')` : ''}"
+                                                class="p-6 rounded-2xl border-3 cursor-pointer transition-all ${isClickable ? 'hover:scale-105 hover:shadow-lg' : 'opacity-40 cursor-not-allowed'}"
+                                                style="border-color: ${b.color}; background-color: ${b.color}22;"
+                                            >
+                                                <div class="flex items-center gap-4">
+                                                    <span class="text-4xl">${b.icon}</span>
+                                                    <span class="text-lg font-bold" style="color: var(--text-dark);">${b.label}</span>
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+
+                            <div class="lg:col-span-5 flex flex-col">
+                                <div class="flex-1 flex items-center justify-center gap-12 p-8 rounded-3xl" style="background-color: var(--dil-blue-soft);">
+                                    <div class="text-center">
+                                        <div class="text-8xl mb-4 animate-pulse">🐕</div>
+                                        <div class="font-bold" style="color: var(--pluto-orange);">Pluto</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-8xl mb-4">🐱</div>
+                                        <div class="font-bold" style="color: var(--mauzi-pink);">Mauzi</div>
+                                    </div>
+                                </div>
+                                <div class="mt-6 p-6 rounded-2xl border" style="border-color: var(--dil-blue-soft); background-color: #f8fafc;">
+                                    <h4 class="text-sm font-bold mb-3 flex items-center gap-2" style="color: var(--dil-blue);">💬 ${t.mauziAide}</h4>
+                                    <div class="font-mono text-sm space-y-1 max-h-32 overflow-y-auto">
+                                        ${consoleLines.length === 0 ? `
+                                            <div class="text-gray-500">${t.waitingForYou}</div>
+                                        ` : consoleLines.map((line) => `
+                                            <div class="flex items-center gap-3 ${line.color}">
+                                                <span class="text-gray-400 text-xs">${line.time}</span>
+                                                ${line.text}
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="lg:col-span-4">
+                                <h3 class="text-xl font-bold mb-4 flex items-center gap-2" style="color: var(--text-dark);">📝 ${t.myProgram}</h3>
+                                <div class="space-y-4 mb-6">
+                                    ${program.map((id, index) => {
+                                        const block = mission.blocks.find(b => b.id === id);
+                                        const isCorrect = index < correctSeq.length && id === correctSeq[index];
+                                        const isWrong = validation && !validation.valid && index === validation.wrongIndex;
+                                        return `
+                                            <div class="flex items-center gap-4">
+                                                <div class="text-xl font-bold text-gray-500 w-10 text-center">${index + 1}.</div>
+                                                <div class="flex-1 p-5 rounded-2xl border-3 flex items-center gap-4 ${isCorrect ? 'border-green-500' : isWrong ? 'border-red-500 animate-wiggle' : 'border-gray-200'}" style="background-color: ${block.color}33; border-color: ${isCorrect ? 'var(--success-green)' : isWrong ? 'var(--error-red)' : block.color};">
+                                                    <span class="text-4xl">${block.icon}</span>
+                                                    <span class="text-lg font-bold" style="color: var(--text-dark);">${block.label}</span>
+                                                    <button onclick="removeBlock(${index})" class="ml-auto text-3xl hover:scale-125 transition-all text-gray-500 hover:text-red-600">×</button>
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                    ${[...Array(Math.max(0, correctSeq.length - program.length))].map((_, emptyIndex) => `
+                                        <div class="flex items-center gap-4">
+                                            <div class="text-xl font-bold text-gray-500 w-10 text-center">${program.length + emptyIndex + 1}.</div>
+                                            <div class="flex-1 p-5 rounded-2xl border-3 border-dashed text-center text-gray-500" style="border-color: #cbd5e1;">?</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <button
+                                    onclick="validateProgram()"
+                                    ${program.length === 0 || (validation && !validation.valid) ? 'disabled' : ''}
+                                    class="w-full py-5 rounded-2xl text-xl font-extrabold transition-all ${program.length === 0 || (validation && !validation.valid) ? 'cursor-not-allowed' : 'hover:scale-105 shadow-lg'} text-white"
+                                    style="background-color: ${program.length === 0 || (validation && !validation.valid) ? '#94a3b8' : 'var(--dil-blue)'};"
+                                >
+                                    ${t.checkCode}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHardwareReady() {
+            const mission = getCurrentMission();
+            if (!mission) return "";
+            const t = translations[currentLanguage];
+
+            return `
+                ${renderHeader()}
+                <div class="flex items-center justify-center px-8 py-12">
+                    <div class="max-w-4xl w-full text-center">
+                        <div class="text-9xl mb-8 animate-bounce">🎉</div>
+                        <h2 class="text-4xl font-extrabold mb-6" style="color: var(--success-green);">${t.successParkourDone}</h2>
+                        <p class="text-xl text-white mb-10">${currentLanguage === 'de' ? 'Jetzt können die Legos loslegen und den Parcours absolvieren!' : 'Now the Legos can start and complete the parkour!'}</p>
+                        <div class="bg-white rounded-3xl p-8 shadow-xl mb-10">
+                            <h3 class="text-2xl font-bold mb-6" style="color: var(--dil-blue);">🗺️ ${currentLanguage === 'de' ? 'Mission des Parcours' : 'Parkour Mission'}</h3>
+                            <div class="flex items-center justify-center gap-4 flex-wrap">
+                                ${mission.hardwareMission.map((s, i) => `
+                                    <div class="flex items-center gap-4">
+                                        <div class="p-4 rounded-xl" style="background-color: var(--dil-blue-soft);">
+                                            <div class="text-2xl">📍</div>
+                                            <div class="font-bold" style="color: var(--text-dark);">${s.label}</div>
+                                        </div>
+                                        ${i < mission.hardwareMission.length - 1 ? '<div class="text-3xl text-gray-400">→</div>' : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <button onclick="startHardware()" class="px-16 py-6 rounded-3xl text-3xl font-extrabold shadow-xl hover:scale-105 transition-all text-white" style="background-color: var(--dil-blue);">
+                            ${t.parkourStart}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHardwareRunning() {
+            const mission = getCurrentMission();
+            if (!mission) return "";
+            const t = translations[currentLanguage];
+
+            return `
+                ${renderHeader()}
+                <div class="flex items-center justify-center px-8 py-12">
+                    <div class="max-w-5xl w-full">
+                        <h2 class="text-4xl font-extrabold mb-2 text-center text-white">🏁 ${t.parkourRunning}</h2>
+                        <p class="text-xl text-center mb-12 text-blue-100">${t.legosOnWay}</p>
+                        <div class="flex items-center justify-center gap-12 flex-wrap mb-12">
+                            <div class="text-8xl animate-bounce">🚗</div>
+                            <div class="text-5xl text-blue-200">→</div>
+                            <div class="text-8xl animate-pulse">🚗</div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                            ${hardwareSteps.map((s, i) => {
+                                const bgColor = s.status === "success" ? "#39c77f22" : s.status === "active" ? "#ffd16622" : "#e8f2ff";
+                                const borderColor = s.status === "success" ? "var(--success-green)" : s.status === "active" ? "var(--parkour-yellow)" : "var(--dil-blue-soft)";
+                                return `
+                                    <div class="p-6 rounded-3xl text-center border-4" style="background-color: ${bgColor}; border-color: ${borderColor};">
+                                        <div class="text-5xl mb-4">${s.status === "success" ? "✅" : s.status === "active" ? "🟡" : "⚪"}</div>
+                                        <div class="text-lg font-bold" style="color: var(--text-dark);">${s.label}</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        <div class="bg-white rounded-3xl p-8 shadow-xl">
+                            <h3 class="text-2xl font-bold mb-6 text-center" style="color: var(--dil-blue);">🔧 ${t.testUs}</h3>
+                            <div class="flex flex-wrap gap-4 justify-center">
+                                ${mission.hardwareMission.map((s) => `
+                                    <button onclick="simulateHardwareStep('${s.sensor}')" class="px-6 py-4 rounded-xl font-bold transition-all hover:scale-105 text-white" style="background-color: var(--dil-blue);">${s.label}</button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSuccess() {
+            const t = translations[currentLanguage];
+            return `
+                ${renderHeader()}
+                <div class="flex items-center justify-center px-8 py-12">
+                    <div class="max-w-4xl w-full text-center">
+                        <div class="text-9xl mb-8 animate-bounce">🏆</div>
+                        <h2 class="text-5xl font-extrabold mb-6" style="color: var(--success-green);">${t.mauziSafe}</h2>
+                        <p class="text-2xl text-white mb-12">${t.didIt}</p>
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <button onclick="resetGame()" class="px-12 py-5 rounded-3xl text-2xl font-extrabold shadow-xl hover:scale-105 transition-all text-white" style="background-color: var(--dil-blue);">
+                                ${t.again}
+                            </button>
+                            <button onclick="phase='level-select'; program=[]; validation=null; consoleLines=[]; render();" class="px-12 py-5 rounded-3xl text-2xl font-extrabold shadow-lg hover:scale-105 transition-all text-gray-800" style="background-color: white;">
+                                ${t.otherMission}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+            switch (phase) {
+                case "welcome": app.innerHTML = renderWelcome(); break;
+                case "level-select": app.innerHTML = renderLevelSelect(); break;
+                case "code-builder": app.innerHTML = renderCodeBuilder(); break;
+                case "hardware-ready": app.innerHTML = renderHardwareReady(); break;
+                case "hardware-running": app.innerHTML = renderHardwareRunning(); break;
+                case "success": app.innerHTML = renderSuccess(); break;
+                default: app.innerHTML = renderWelcome(); break;
+            }
+        }
+
+        render();
+    </script>
+</body>
+</html>
