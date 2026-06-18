@@ -1,6 +1,9 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
+import CharacterStage from './characters/CharacterStage'
+import { MauziState, PlutoState, mauziImages, plutoImages } from './characters/characterAssets'
+import Header from './components/Header'
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
+const BACKEND_URL = "http://localhost:8080";
 
 // --- TRANSLATIONS ---
 const translations = {
@@ -232,6 +235,7 @@ type Phase =
 type Block = { id: string; label: string; icon: string; color: string }
 type HardwareStep = { id: string; label: string; sensor: string; status: "pending" | "active" | "success" }
 type ConsoleLine = { text: string; color: string; time: string }
+type Hints = Record<string, string>
 
 // --- COMPONENTS ---
 const Welcome = ({ onStart, t, onLanguageChange, lang }: { 
@@ -240,39 +244,27 @@ const Welcome = ({ onStart, t, onLanguageChange, lang }: {
   onLanguageChange: (l: 'en' | 'de') => void;
   lang: 'en' | 'de'
 }) => (
-  <div className="min-h-screen flex items-center justify-center p-8 bg-gradient-to-b from-slate-900 to-indigo-900">
-    <div className="max-w-4xl w-full text-center">
-      <div className="flex justify-center gap-12 mb-10">
-        <div className="text-9xl animate-bounce" style={{ animationDuration: "3s" }}>🐱</div>
-        <div className="text-9xl animate-pulse" style={{ animationDuration: "2s" }}>🐕</div>
-      </div>
-      <h1 className="text-7xl font-extrabold mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-        {t.appTitle}
-      </h1>
-      <p className="text-2xl text-slate-300 mb-10 max-w-2xl mx-auto">
-        {lang === "de" 
-          ? "Lerne Programmieren, indem du Mauzi vor Pluto schützt!" 
-          : "Learn to code by protecting Mauzi from Pluto!"}
-      </p>
-      
-      <div className="flex gap-4 justify-center mb-10">
-        <button 
-          onClick={() => onLanguageChange('de')} 
-          className={`px-4 py-2 rounded-xl text-lg font-semibold transition-all hover:scale-105 ${lang === 'de' ? 'bg-cyan-500 text-white' : 'bg-slate-700 text-slate-300'}`}
-        >
-          🇩🇪 Deutsch
-        </button>
-        <button 
-          onClick={() => onLanguageChange('en')} 
-          className={`px-4 py-2 rounded-xl text-lg font-semibold transition-all hover:scale-105 ${lang === 'en' ? 'bg-cyan-500 text-white' : 'bg-slate-700 text-slate-300'}`}
-        >
-          🇬🇧 English
-        </button>
-      </div>
+  <div className="min-h-screen flex flex-col bg-[#004284]">
+    <Header lang={lang} onLanguageChange={onLanguageChange} />
+    <div className="flex-1 flex items-center justify-center p-8">
+      <div className="max-w-4xl w-full text-center bg-white rounded-3xl p-12 shadow-2xl">
+        <div className="flex justify-center items-end gap-12 mb-10">
+          <img src={plutoImages.normal} alt="Pluto" className="w-40 h-40 object-contain animate-bounce" style={{ animationDuration: "3s" }} />
+          <img src={mauziImages.idle} alt="Mauzi" className="w-40 h-40 object-contain animate-pulse" style={{ animationDuration: "2s" }} />
+        </div>
+        <h1 className="text-7xl font-extrabold mb-6 text-[#004284]">
+          {t.appTitle}
+        </h1>
+        <p className="text-2xl text-gray-600 mb-10 max-w-2xl mx-auto">
+          {lang === "de" 
+            ? "Lerne Programmieren, indem du Mauzi vor Pluto schützt!" 
+            : "Learn to code by protecting Mauzi from Pluto!"}
+        </p>
 
-      <button onClick={onStart} className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 px-16 py-6 rounded-3xl text-3xl font-extrabold shadow-2xl hover:scale-105 transition-all">
-        {t.playNow}
-      </button>
+        <button onClick={onStart} className="bg-[#004284] hover:bg-[#003366] px-16 py-6 rounded-3xl text-3xl font-extrabold shadow-2xl hover:scale-105 transition-all text-white">
+          {t.playNow}
+        </button>
+      </div>
     </div>
   </div>
 )
@@ -283,54 +275,39 @@ const LevelSelect = ({ onSelect, t, onLanguageChange, lang }: {
   onLanguageChange: (l: 'en' | 'de') => void;
   lang: 'en' | 'de'
 }) => (
-  <div className="min-h-screen flex items-center justify-center p-8 bg-gradient-to-b from-slate-900 to-indigo-900">
-    <div className="max-w-6xl w-full">
-      <div className="flex items-center justify-between mb-8">
-        <button onClick={() => { /* Back to welcome could be added */ }} className="text-slate-400 hover:text-white text-2xl"></button>
-        <h2 className="text-5xl font-extrabold text-white">{t.pickMission}</h2>
-        <div className="flex gap-3">
-          <button 
-            onClick={() => onLanguageChange('de')} 
-            className={`px-4 py-2 rounded-xl text-lg font-semibold transition-all hover:scale-105 ${lang === 'de' ? 'bg-cyan-500 text-white' : 'bg-slate-700 text-slate-300'}`}
-          >
-            🇩🇪
-          </button>
-          <button 
-            onClick={() => onLanguageChange('en')} 
-            className={`px-4 py-2 rounded-xl text-lg font-semibold transition-all hover:scale-105 ${lang === 'en' ? 'bg-cyan-500 text-white' : 'bg-slate-700 text-slate-300'}`}
-          >
-            🇬🇧
-          </button>
+  <div className="min-h-screen flex flex-col bg-[#004284]">
+    <Header lang={lang} onLanguageChange={onLanguageChange} />
+    <div className="flex-1 flex items-center justify-center p-8">
+      <div className="max-w-6xl w-full">
+        <h2 className="text-5xl font-extrabold text-white text-center mb-4">{t.pickMission}</h2>
+        <p className="text-xl text-blue-100 text-center mb-12">{t.eachMission}</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {getMissionData(lang).map((m) => (
+            <button key={m.id} onClick={() => onSelect(m.id)} className="bg-white border-2 border-[#004284] hover:border-[#003366] rounded-3xl p-10 text-left hover:shadow-2xl transition-all hover:-translate-y-2">
+              <div className="text-6xl mb-4">{m.level === "easy" ? "🌱" : m.level === "mid" ? "🌿" : "🌳"}</div>
+              <div className="text-sm uppercase tracking-widest text-gray-500 mb-2">
+                {t.levelLabel} {m.level === "easy" ? t.easy : m.level === "mid" ? t.medium : t.hard}
+              </div>
+              <div className="text-2xl font-bold text-[#004284] mb-3">{m.title}</div>
+              <div className="text-gray-600">{m.story.substring(0, 80)}...</div>
+            </button>
+          ))}
         </div>
-      </div>
-      
-      <p className="text-xl text-slate-400 text-center mb-12">{t.eachMission}</p>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {getMissionData(lang).map((m) => (
-          <button key={m.id} onClick={() => onSelect(m.id)} className="bg-slate-800 border-2 border-slate-700 hover:border-cyan-400 rounded-3xl p-10 text-left hover:shadow-2xl transition-all hover:-translate-y-2">
-            <div className="text-6xl mb-4">{m.level === "easy" ? "🌱" : m.level === "mid" ? "🌿" : "🌳"}</div>
-            <div className="text-sm uppercase tracking-widest text-slate-400 mb-2">
-              {t.levelLabel} {m.level === "easy" ? t.easy : m.level === "mid" ? t.medium : t.hard}
-            </div>
-            <div className="text-2xl font-bold text-white mb-3">{m.title}</div>
-            <div className="text-slate-400">{m.story.substring(0, 80)}...</div>
-          </button>
-        ))}
       </div>
     </div>
   </div>
 )
 
 const Console = ({ lines, t }: { lines: ConsoleLine[]; t: any }) => (
-  <div className="bg-slate-900 border-t border-slate-700 p-5">
-    <h4 className="text-sm font-bold text-slate-400 mb-3 flex items-center gap-2">💬 {t.mauziAide}</h4>
+  <div className="bg-gray-50 border-t border-gray-200 p-5">
+    <h4 className="text-sm font-bold text-gray-600 mb-3 flex items-center gap-2">💬 {t.mauziAide}</h4>
     <div className="font-mono text-sm space-y-1 max-h-32 overflow-y-auto">
       {lines.length === 0 ? (
-        <div className="text-slate-600">{t.waitingForYou}</div>
+        <div className="text-gray-400">{t.waitingForYou}</div>
       ) : (
         lines.map((line, i) => (
           <div key={i} className={`flex items-center gap-3 ${line.color}`}>
-            <span className="text-slate-500 text-xs">[{line.time}]</span>
+            <span className="text-gray-400 text-xs">[{line.time}]</span>
             {line.text}
           </div>
         ))
@@ -350,12 +327,17 @@ const CodeBuilder = ({
   onReset,
   t,
   onLanguageChange,
-  lang
+  lang,
+  mauziState,
+  plutoState,
+  speech
 }: any) => {
   const correctSeq = mission.correctSequence
   
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-slate-900 to-indigo-900">
+    <div className="min-h-screen flex flex-col bg-[#004284]">
+      <Header lang={lang} onLanguageChange={onLanguageChange} onBack={onReset} />
+      
       {/* FRIENDLY ERROR BANNER AT TOP IF THERE'S AN ERROR */}
       {validation && !validation.valid && (
         <div className="bg-gradient-to-r from-red-500 to-orange-500 p-5 border-b-3 border-orange-600 shadow-lg fade-in">
@@ -367,40 +349,23 @@ const CodeBuilder = ({
         </div>
       )}
 
-      <div className="bg-slate-900/90 backdrop-blur border-b border-slate-700 p-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button onClick={onReset} className="text-slate-400 hover:text-white text-2xl">←</button>
-          <div>
-            <h1 className="text-3xl font-extrabold text-white">{mission.title}</h1>
-            <p className="text-slate-400">
-              {mission.level === "easy" ? t.easy : mission.level === "mid" ? t.medium : t.hard}
-            </p>
-          </div>
-        </div>
-        <div className="flex gap-3">
-          <button 
-            onClick={() => onLanguageChange('de')} 
-            className={`px-4 py-2 rounded-xl text-lg font-semibold transition-all hover:scale-105 ${lang === 'de' ? 'bg-cyan-500 text-white' : 'bg-slate-700 text-slate-300'}`}
-          >
-            🇩🇪
-          </button>
-          <button 
-            onClick={() => onLanguageChange('en')} 
-            className={`px-4 py-2 rounded-xl text-lg font-semibold transition-all hover:scale-105 ${lang === 'en' ? 'bg-cyan-500 text-white' : 'bg-slate-700 text-slate-300'}`}
-          >
-            🇬🇧
-          </button>
+      <div className="bg-white/95 backdrop-blur border-b border-gray-200 p-6">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl font-extrabold text-[#004284]">{mission.title}</h1>
+          <p className="text-gray-600">
+            {mission.level === "easy" ? t.easy : mission.level === "mid" ? t.medium : t.hard}
+          </p>
         </div>
       </div>
 
-      <div className="bg-gradient-to-r from-slate-800/80 to-indigo-800/80 p-6 border-b border-slate-700">
-        <p className="text-xl text-center text-slate-200 max-w-4xl mx-auto">{mission.story}</p>
+      <div className="bg-blue-50 p-6 border-b border-blue-100">
+        <p className="text-xl text-center text-[#004284] max-w-4xl mx-auto">{mission.story}</p>
       </div>
 
-      <div className="flex-1 grid grid-cols-12 gap-6 p-6">
+      <div className="flex-1 grid grid-cols-12 gap-6 p-6 max-w-[1800px] mx-auto w-full">
         {/* Left: Available Blocks */}
-        <div className="col-span-3 bg-slate-800/70 rounded-3xl p-6 border border-slate-700 flex flex-col">
-          <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">🧱 {t.waitActions}</h3>
+        <div className="col-span-3 bg-white rounded-3xl p-6 border border-gray-200 flex flex-col shadow-lg">
+          <h3 className="text-2xl font-bold text-[#004284] mb-6 flex items-center gap-3">🧱 {t.waitActions}</h3>
           <div className="flex-1 space-y-4">
             {mission.blocks.map((b: Block) => {
               const isAdded = program.includes(b.id)
@@ -416,7 +381,8 @@ const CodeBuilder = ({
                     p-5 
                     rounded-2xl 
                     border-2 
-                    ${isClickable ? "cursor-pointer hover:scale-105 hover:shadow-xl" : "opacity-40 cursor-not-allowed"} 
+                    border-transparent
+                    ${isClickable ? "cursor-pointer hover:scale-105 hover:shadow-xl hover:border-[#004284]" : "opacity-40 cursor-not-allowed"} 
                     transition-all
                   `}
                 >
@@ -431,23 +397,16 @@ const CodeBuilder = ({
         </div>
 
         {/* Middle: Characters & Console */}
-        <div className="col-span-5 bg-slate-800/50 rounded-3xl border border-slate-700 flex flex-col">
-          <div className="flex-1 flex items-center justify-center gap-20 p-8">
-            <div className="text-center">
-              <div className="text-8xl mb-4 animate-pulse">🐕</div>
-              <div className="text-xl font-bold text-orange-400">Pluto</div>
-            </div>
-            <div className="text-center">
-              <div className="text-8xl mb-4">🐱</div>
-              <div className="text-xl font-bold text-cyan-400">Mauzi</div>
-            </div>
+        <div className="col-span-5 bg-white rounded-3xl border border-gray-200 flex flex-col shadow-lg">
+          <div className="flex-1">
+            <CharacterStage mauziState={mauziState} plutoState={plutoState} speech={speech} />
           </div>
           <Console lines={consoleLines} t={t} />
         </div>
 
         {/* Right: Program */}
-        <div className="col-span-4 bg-slate-800/70 rounded-3xl p-6 border border-slate-700 flex flex-col">
-          <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">📝 {t.myProgram}</h3>
+        <div className="col-span-4 bg-white rounded-3xl p-6 border border-gray-200 flex flex-col shadow-lg">
+          <h3 className="text-2xl font-bold text-[#004284] mb-6 flex items-center gap-3">📝 {t.myProgram}</h3>
           <div className="flex-1 space-y-4 overflow-y-auto max-h-[500px]">
             {program.map((id: string, index: number) => {
               const block = mission.blocks.find((b: Block) => b.id === id)
@@ -456,7 +415,7 @@ const CodeBuilder = ({
               
               return (
                 <div key={index} className="flex items-center gap-4">
-                  <div className="text-2xl font-bold text-slate-500 w-10 text-center">{index + 1}.</div>
+                  <div className="text-2xl font-bold text-gray-400 w-10 text-center">{index + 1}.</div>
                   <div className={`
                     flex-1 
                     ${block.color} 
@@ -480,8 +439,8 @@ const CodeBuilder = ({
             })}
             {[...Array(Math.max(0, correctSeq.length - program.length))].map((_, emptyIndex) => (
               <div key={`empty-${emptyIndex}`} className="flex items-center gap-4">
-                <div className="text-2xl font-bold text-slate-500 w-10 text-center">{program.length + emptyIndex + 1}.</div>
-                <div className="flex-1 bg-slate-900/50 border-2 border-dashed border-slate-700 p-5 rounded-2xl text-center text-slate-500">
+                <div className="text-2xl font-bold text-gray-400 w-10 text-center">{program.length + emptyIndex + 1}.</div>
+                <div className="flex-1 bg-gray-100 border-2 border-dashed border-gray-300 p-5 rounded-2xl text-center text-gray-400">
                   ?
                 </div>
               </div>
@@ -500,8 +459,8 @@ const CodeBuilder = ({
               font-bold 
               transition-all 
               ${program.length === 0 || (validation && !validation.valid) 
-                ? "bg-slate-700 text-slate-500 cursor-not-allowed" 
-                : "bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 text-yellow-900 shadow-lg"
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                : "bg-[#004284] hover:bg-[#003366] text-white shadow-lg hover:scale-105"
               }
             `}
           >
@@ -513,66 +472,71 @@ const CodeBuilder = ({
   )
 }
 
-const HardwareReady = ({ mission, onStart, t }: { mission: any; onStart: () => void; t: any }) => (
-  <div className="min-h-screen flex items-center justify-center p-8 bg-gradient-to-b from-slate-900 to-green-900/30">
-    <div className="max-w-4xl w-full text-center">
-      <div className="text-9xl mb-8 animate-bounce">🎉</div>
-      <h2 className="text-5xl font-extrabold mb-6 text-green-400">{t.programPerfect}</h2>
-      <p className="text-2xl text-slate-300 mb-10">{t.nowLegoCanGo}</p>
-      
-      <div className="bg-slate-800 rounded-3xl p-8 border border-green-500/50 mb-10">
-        <h3 className="text-2xl font-bold mb-6 text-cyan-400">🗺️ {t.parkourMission}</h3>
-        <div className="flex items-center justify-center gap-4 flex-wrap">
-          {mission.hardwareMission.map((s: any, i: number) => (
-            <div key={s.id} className="flex items-center gap-4">
-              <div className="bg-slate-700 px-6 py-4 rounded-2xl border border-slate-600">
-                <div className="text-2xl">📍</div>
-                <div className="font-bold text-white">{s.label}</div>
+const HardwareReady = ({ mission, onStart, t, onLanguageChange, lang }: { mission: any; onStart: () => void; t: any; onLanguageChange: (l: 'en' | 'de') => void; lang: 'en' | 'de' }) => (
+  <div className="min-h-screen flex flex-col bg-[#004284]">
+    <Header lang={lang} onLanguageChange={onLanguageChange} />
+    <div className="flex-1 flex items-center justify-center p-8">
+      <div className="max-w-4xl w-full text-center bg-white rounded-3xl p-12 shadow-2xl">
+        <div className="text-9xl mb-8 animate-bounce">🎉</div>
+        <h2 className="text-5xl font-extrabold mb-6 text-green-600">{t.programPerfect}</h2>
+        <p className="text-2xl text-gray-600 mb-10">{t.nowLegoCanGo}</p>
+        
+        <div className="bg-gray-50 rounded-3xl p-8 border border-green-200 mb-10">
+          <h3 className="text-2xl font-bold mb-6 text-[#004284]">🗺️ {t.parkourMission}</h3>
+          <div className="flex items-center justify-center gap-4 flex-wrap">
+            {mission.hardwareMission.map((s: any, i: number) => (
+              <div key={s.id} className="flex items-center gap-4">
+                <div className="bg-white px-6 py-4 rounded-2xl border border-gray-300 shadow-sm">
+                  <div className="text-2xl">📍</div>
+                  <div className="font-bold text-gray-800">{s.label}</div>
+                </div>
+                {i < mission.hardwareMission.length - 1 && <div className="text-3xl text-gray-400">→</div>}
               </div>
-              {i < mission.hardwareMission.length - 1 && <div className="text-3xl text-slate-500">→</div>}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
-      <button onClick={onStart} className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 px-16 py-6 rounded-3xl text-3xl font-extrabold shadow-2xl hover:scale-105 transition-all">
-        🚗 {t.parkourStart}
-      </button>
+        <button onClick={onStart} className="bg-[#004284] hover:bg-[#003366] px-16 py-6 rounded-3xl text-3xl font-extrabold shadow-2xl hover:scale-105 transition-all text-white">
+          🚗 {t.parkourStart}
+        </button>
+      </div>
     </div>
   </div>
 )
 
-const HardwareRunning = ({ mission, hardwareSteps, onSimulate, onReset, t }: any) => (
-  <div className="min-h-screen flex flex-col bg-gradient-to-b from-slate-900 to-indigo-900">
-    <div className="bg-slate-900/90 border-b border-slate-700 p-6 text-center">
-      <h2 className="text-5xl font-extrabold text-white">🏁 {t.parkourRunning}</h2>
-      <p className="text-xl text-slate-400 mt-2">{t.legosOnWay}</p>
+const HardwareRunning = ({ mission, hardwareSteps, onSimulate, onReset, t, onLanguageChange, lang }: any) => (
+  <div className="min-h-screen flex flex-col bg-[#004284]">
+    <Header lang={lang} onLanguageChange={onLanguageChange} onBack={onReset} />
+    <div className="bg-white/95 backdrop-blur border-b border-gray-200 p-6 text-center">
+      <h2 className="text-5xl font-extrabold text-[#004284]">🏁 {t.parkourRunning}</h2>
+      <p className="text-xl text-gray-600 mt-2">{t.legosOnWay}</p>
     </div>
     <div className="flex-1 flex items-center justify-center p-8">
       <div className="max-w-5xl w-full">
         <div className="flex items-center justify-center gap-8 flex-wrap mb-12">
           <div className="text-8xl animate-bounce">🚗</div>
-          <div className="text-5xl text-slate-600">→</div>
+          <div className="text-5xl text-blue-200">→</div>
           <div className="text-8xl animate-pulse">🚗</div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {hardwareSteps.map((s: HardwareStep, i: number) => {
-            const colorClass = s.status === "success" ? "bg-green-900/30 border-green-500" : s.status === "active" ? "bg-cyan-900/30 border-cyan-500" : "bg-slate-800 border-slate-700"
+          {hardwareSteps.map((s: HardwareStep) => {
+            const colorClass = s.status === "success" ? "bg-green-50 border-green-500" : s.status === "active" ? "bg-blue-50 border-[#004284]" : "bg-white border-gray-200"
+            const textClass = s.status === "success" ? "text-green-800" : s.status === "active" ? "text-[#004284]" : "text-gray-800"
             return (
-              <div key={s.id} className={`${colorClass} border-2 rounded-3xl p-6 text-center`}>
+              <div key={s.id} className={`${colorClass} border-2 rounded-3xl p-6 text-center shadow-sm`}>
                 <div className="text-5xl mb-4">{s.status === "success" ? "✅" : s.status === "active" ? "🟡" : "⚪"}</div>
-                <div className="text-xl font-bold text-white">{s.label}</div>
+                <div className={`text-xl font-bold ${textClass}`}>{s.label}</div>
               </div>
             )
           })}
         </div>
 
-        <div className="bg-slate-800 rounded-3xl p-8 border border-slate-700">
-          <h3 className="text-2xl font-bold mb-6 text-center text-cyan-400">🔧 {t.testUs}</h3>
+        <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-lg">
+          <h3 className="text-2xl font-bold mb-6 text-center text-[#004284]">🔧 {t.testUs}</h3>
           <div className="flex flex-wrap gap-4 justify-center">
             {mission.hardwareMission.map((s: any) => (
-              <button key={s.id} onClick={() => onSimulate(s.sensor)} className="bg-slate-700 hover:bg-slate-600 px-6 py-4 rounded-2xl font-bold text-white transition-all hover:scale-105">
+              <button key={s.id} onClick={() => onSimulate(s.sensor)} className="bg-[#004284] hover:bg-[#003366] px-6 py-4 rounded-2xl font-bold text-white transition-all hover:scale-105 shadow-md">
                 {s.label}
               </button>
             ))}
@@ -583,19 +547,25 @@ const HardwareRunning = ({ mission, hardwareSteps, onSimulate, onReset, t }: any
   </div>
 )
 
-const Success = ({ onAgain, onAnother, t }: { onAgain: () => void; onAnother: () => void; t: any }) => (
-  <div className="min-h-screen flex items-center justify-center p-8 bg-gradient-to-b from-slate-900 to-green-900/30">
-    <div className="max-w-4xl w-full text-center">
-      <div className="text-9xl mb-8 animate-bounce">🏆</div>
-      <h2 className="text-6xl font-extrabold text-green-400 mb-6">{t.mauziSafe}</h2>
-      <p className="text-2xl text-slate-300 mb-12">{t.youDidIt}</p>
-      <div className="flex flex-wrap gap-4 justify-center">
-        <button onClick={onAgain} className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 px-12 py-5 rounded-3xl text-2xl font-extrabold shadow-2xl hover:scale-105 transition-all text-white">
-          {t.again}
-        </button>
-        <button onClick={onAnother} className="bg-slate-700 hover:bg-slate-600 px-12 py-5 rounded-3xl text-2xl font-extrabold shadow-xl hover:scale-105 transition-all text-white">
-          {t.otherMission}
-        </button>
+const Success = ({ onAgain, onAnother, t, onLanguageChange, lang }: { onAgain: () => void; onAnother: () => void; t: any; onLanguageChange: (l: 'en' | 'de') => void; lang: 'en' | 'de' }) => (
+  <div className="min-h-screen flex flex-col bg-[#004284]">
+    <Header lang={lang} onLanguageChange={onLanguageChange} />
+    <div className="flex-1 flex items-center justify-center p-8">
+      <div className="max-w-4xl w-full text-center bg-white rounded-3xl p-12 shadow-2xl">
+        <div className="flex justify-center items-end gap-12 mb-8">
+          <img src={plutoImages.retreating} alt="Pluto" className="w-40 h-40 object-contain animate-pulse" style={{ animationDuration: "3s" }} />
+          <img src={mauziImages.waving} alt="Mauzi" className="w-40 h-40 object-contain animate-bounce" style={{ animationDuration: "2s" }} />
+        </div>
+        <h2 className="text-6xl font-extrabold text-green-600 mb-6">{t.mauziSafe}</h2>
+        <p className="text-2xl text-gray-600 mb-12">{t.youDidIt}</p>
+        <div className="flex flex-wrap gap-4 justify-center">
+          <button onClick={onAgain} className="bg-[#004284] hover:bg-[#003366] px-12 py-5 rounded-3xl text-2xl font-extrabold shadow-2xl hover:scale-105 transition-all text-white">
+            {t.again}
+          </button>
+          <button onClick={onAnother} className="bg-gray-200 hover:bg-gray-300 px-12 py-5 rounded-3xl text-2xl font-extrabold shadow-xl hover:scale-105 transition-all text-gray-800">
+            {t.otherMission}
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -610,6 +580,9 @@ const App = () => {
   const [hardwareSteps, setHardwareSteps] = useState<HardwareStep[]>([])
   const [currentHardwareStepIndex, setCurrentHardwareStepIndex] = useState(0)
   const [consoleLines, setConsoleLines] = useState<ConsoleLine[]>([])
+  const [mauziState, setMauziState] = useState<MauziState>('sleeping')
+  const [plutoState, setPlutoState] = useState<PlutoState>('sneaking')
+  const [speech, setSpeech] = useState<string>('Mauzi schläft noch…')
   const wsRef = useRef<WebSocket | null>(null)
 
   const t = translations[lang]
@@ -662,6 +635,49 @@ const App = () => {
     setConsoleLines(prev => [...prev, newLine])
   }
 
+  const playCharacterReaction = (actionId: string) => {
+    switch (actionId) {
+      case 'augen-auf':
+        setMauziState('eyes-half-open')
+        setPlutoState('surprised')
+        setSpeech('Oh! Mauzi öffnet die Augen!')
+        setTimeout(() => {
+          setMauziState('eyes-open')
+        }, 500)
+        break
+      case 'aufstehen':
+        setMauziState('standing')
+        setPlutoState('genervt')
+        setSpeech('Mauzi steht auf!')
+        break
+      case 'winken':
+        setMauziState('waving')
+        setPlutoState('surprised')
+        setSpeech('Mauzi winkt Pluto zu!')
+        break
+      case 'licht-an':
+        setMauziState('idle')
+        setPlutoState('light')
+        setSpeech('Pluto ist geblendet!')
+        break
+      case 'musik':
+        setMauziState('music')
+        setPlutoState('music')
+        setSpeech('Pluto tanzt plötzlich mit!')
+        break
+      case 'schutz':
+        setMauziState('schutz')
+        setPlutoState('schutz')
+        setSpeech('Boing! Mauzi ist geschützt!')
+        setTimeout(() => {
+          setPlutoState('retreating')
+        }, 900)
+        break
+      default:
+        break
+    }
+  }
+
   // Handle WebSocket messages from backend
   const handleWebSocketMessage = (msg: any) => {
     switch (msg.type) {
@@ -709,6 +725,9 @@ const App = () => {
     setProgram([])
     setValidation(null)
     setConsoleLines([])
+    setMauziState('sleeping')
+    setPlutoState('sneaking')
+    setSpeech('Mauzi schläft noch…')
     setPhase("code-builder")
     addConsoleLine(`🎯 ${t.missionStart}`, "info")
   }
@@ -725,14 +744,18 @@ const App = () => {
         const index = newProgram.length - 1
         
         if (index < correctSeq.length && newProgram[index] !== correctSeq[index]) {
-          const message = currentMission.hints[correctSeq[index]]
+          const message = (currentMission.hints as Hints)[correctSeq[index]]
           setValidation({ valid: false, wrongIndex: index, message })
           addConsoleLine(`❌ ${t.oops} ${message}`, "error")
+          setMauziState('confused')
+          setPlutoState('genervt')
+          setSpeech(message)
         } else {
           setValidation(null)
           const block = currentMission.blocks.find(b => b.id === id)
           if (block) {
             addConsoleLine(`➕ ${t.actionAdded} ${block.label}`, "info")
+            playCharacterReaction(id)
           }
         }
       }
@@ -741,16 +764,26 @@ const App = () => {
 
   const removeBlock = (index: number) => {
     const block = currentMission?.blocks.find(b => b.id === program[index])
-    setProgram(program.filter((_, i) => i !== index))
+    const newProgram = program.filter((_, i) => i !== index)
+    setProgram(newProgram)
     setValidation(null)
     if (block) {
       addConsoleLine(`➖ ${t.actionRemoved} ${block.label}`, "info")
+    }
+    // Reset states based on remaining program
+    if (newProgram.length === 0) {
+      setMauziState('sleeping')
+      setPlutoState('sneaking')
+      setSpeech('Mauzi schläft noch…')
+    } else {
+      // Replay last action
+      const lastAction = newProgram[newProgram.length - 1]
+      playCharacterReaction(lastAction)
     }
   }
 
   const validateProgram = async () => {
     if (!currentMission) return;
-    const correctSeq = currentMission.correctSequence;
     const difficulty = currentMission.level;
 
     try {
@@ -780,6 +813,9 @@ const App = () => {
         const message = result.steps?.[wrongIndex]?.message || result.errors?.[0] || "Fehler!";
         setValidation({ valid: false, wrongIndex, message });
         addConsoleLine(`❌ ${t.oops} ${message}`, "error");
+        setMauziState('confused');
+        setPlutoState('genervt');
+        setSpeech(message);
       }
 
     } catch (error) {
@@ -796,9 +832,12 @@ const App = () => {
 
     for (let i = 0; i < program.length; i++) {
       if (program[i] !== correctSeq[i]) {
-        const message = currentMission.hints[correctSeq[i]];
+        const message = (currentMission.hints as Hints)[correctSeq[i]];
         setValidation({ valid: false, wrongIndex: i, message });
         addConsoleLine(`❌ ${t.oops} ${message}`, "error");
+        setMauziState('confused');
+        setPlutoState('genervt');
+        setSpeech(message);
         return;
       }
     }
@@ -807,6 +846,9 @@ const App = () => {
       const message = lang === 'de' ? "Es fehlt noch mindestens eine Aktion!" : "At least one action is still missing!";
       setValidation({ valid: false, wrongIndex: program.length, message });
       addConsoleLine(`⚠️ ${message}`, "error");
+      setMauziState('confused');
+      setPlutoState('genervt');
+      setSpeech(message);
       return;
     }
 
@@ -824,7 +866,7 @@ const App = () => {
     if (!currentMission) return;
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/session/start`, {
+      await fetch(`${BACKEND_URL}/api/session/start`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -893,9 +935,12 @@ const App = () => {
         t={t}
         onLanguageChange={handleLanguageChange}
         lang={lang}
+        mauziState={mauziState}
+        plutoState={plutoState}
+        speech={speech}
       />
     ) : null
-    case "hardware-ready": return currentMission ? <HardwareReady mission={currentMission} onStart={startHardware} t={t} /> : null
+    case "hardware-ready": return currentMission ? <HardwareReady mission={currentMission} onStart={startHardware} t={t} onLanguageChange={handleLanguageChange} lang={lang} /> : null
     case "hardware-running": return currentMission ? (
       <HardwareRunning
         mission={currentMission}
@@ -903,6 +948,8 @@ const App = () => {
         onSimulate={simulateHardwareStep}
         onReset={resetGame}
         t={t}
+        onLanguageChange={handleLanguageChange}
+        lang={lang}
       />
     ) : null
     case "success": return (
@@ -913,8 +960,13 @@ const App = () => {
           setProgram([])
           setValidation(null)
           setConsoleLines([])
+          setMauziState("sleeping")
+          setPlutoState("sneaking")
+          setSpeech("Mauzi schläft noch…")
         }}
         t={t}
+        onLanguageChange={handleLanguageChange}
+        lang={lang}
       />
     )
     default: return <Welcome onStart={startGame} t={t} onLanguageChange={handleLanguageChange} lang={lang} />
