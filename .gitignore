@@ -1,0 +1,13 @@
+# Frontend
+frontend copy/node_modules/
+frontend copy/dist/
+
+# Backend Java / Maven
+Backend/backend/target/
+Backend/target/
+*.class
+
+# IDE / fichiers générés
+.idea/
+out/
+*.log
