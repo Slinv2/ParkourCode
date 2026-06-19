@@ -10,27 +10,27 @@ interface CharacterStageProps {
 
 const CharacterStage: React.FC<CharacterStageProps> = ({ mauziState, plutoState, speech }) => {
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center p-4">
+    <div className="relative w-full flex flex-col items-center justify-center p-2 md:p-4">
       {/* Speech bubble */}
       {speech && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white px-6 py-4 rounded-2xl shadow-lg border-4 border-cyan-300 z-10 max-w-md text-center">
-          <div className="text-lg font-bold text-slate-800">{speech}</div>
+        <div className="relative mb-6 md:mb-8 bg-white px-4 md:px-6 py-3 md:py-4 rounded-2xl shadow-lg border-4 border-[#004284] z-10 max-w-xs md:max-w-md text-center">
+          <div className="text-base md:text-lg font-bold text-slate-800">{speech}</div>
           {/* Speech bubble tail */}
-          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[16px] border-t-cyan-300"></div>
+          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[16px] border-t-[#004284]"></div>
         </div>
       )}
 
       {/* Characters */}
-      <div className="flex items-end justify-center gap-8 md:gap-16 mt-20">
+      <div className="flex items-end justify-center gap-4 md:gap-8 lg:gap-16">
         {/* Pluto */}
         <div className="text-center">
           <img
             src={plutoImages[plutoState]}
             alt="Pluto"
-            className="w-32 h-32 md:w-48 md:h-48 object-contain animate-bounce"
+            className="w-24 h-24 md:w-32 lg:w-48 h-auto object-contain animate-bounce"
             style={{ animationDuration: '3s' }}
           />
-          <div className="mt-2 text-xl font-bold text-orange-400">Pluto</div>
+          <div className="mt-1 md:mt-2 text-lg md:text-xl font-bold text-[#ff9500]">Pluto</div>
         </div>
 
         {/* Mauzi */}
@@ -38,10 +38,10 @@ const CharacterStage: React.FC<CharacterStageProps> = ({ mauziState, plutoState,
           <img
             src={mauziImages[mauziState]}
             alt="Mauzi"
-            className="w-32 h-32 md:w-48 md:h-48 object-contain animate-pulse"
+            className="w-24 h-24 md:w-32 lg:w-48 h-auto object-contain animate-pulse"
             style={{ animationDuration: '2s' }}
           />
-          <div className="mt-2 text-xl font-bold text-cyan-400">Mauzi</div>
+          <div className="mt-1 md:mt-2 text-lg md:text-xl font-bold text-[#00a4e4]">Mauzi</div>
         </div>
       </div>
     </div>

@@ -234,7 +234,6 @@ type Phase =
 
 type Block = { id: string; label: string; icon: string; color: string }
 type HardwareStep = { id: string; label: string; sensor: string; status: "pending" | "active" | "success" }
-type ConsoleLine = { text: string; color: string; time: string }
 type Hints = Record<string, string>
 
 // --- COMPONENTS ---
@@ -244,24 +243,24 @@ const Welcome = ({ onStart, t, onLanguageChange, lang }: {
   onLanguageChange: (l: 'en' | 'de') => void;
   lang: 'en' | 'de'
 }) => (
-  <div className="min-h-screen flex flex-col bg-[#004284]">
+  <div className="min-h-screen flex flex-col bg-[#004284] overflow-y-auto">
     <Header lang={lang} onLanguageChange={onLanguageChange} />
-    <div className="flex-1 flex items-center justify-center p-8">
-      <div className="max-w-4xl w-full text-center bg-white rounded-3xl p-12 shadow-2xl">
-        <div className="flex justify-center items-end gap-12 mb-10">
-          <img src={plutoImages.normal} alt="Pluto" className="w-40 h-40 object-contain animate-bounce" style={{ animationDuration: "3s" }} />
-          <img src={mauziImages.idle} alt="Mauzi" className="w-40 h-40 object-contain animate-pulse" style={{ animationDuration: "2s" }} />
+    <div className="flex-1 flex items-center justify-center p-4 md:p-8">
+      <div className="max-w-4xl w-full text-center bg-white rounded-3xl p-8 md:p-12 shadow-2xl">
+        <div className="flex justify-center items-end gap-6 md:gap-12 mb-8 md:mb-10">
+          <img src={plutoImages.normal} alt="Pluto" className="w-24 h-24 md:w-32 lg:w-40 h-auto object-contain animate-bounce" style={{ animationDuration: "3s" }} />
+          <img src={mauziImages.idle} alt="Mauzi" className="w-24 h-24 md:w-32 lg:w-40 h-auto object-contain animate-pulse" style={{ animationDuration: "2s" }} />
         </div>
-        <h1 className="text-7xl font-extrabold mb-6 text-[#004284]">
+        <h1 className="text-4xl md:text-5xl lg:text-7xl font-extrabold mb-4 md:mb-6 text-[#004284]">
           {t.appTitle}
         </h1>
-        <p className="text-2xl text-gray-600 mb-10 max-w-2xl mx-auto">
+        <p className="text-lg md:text-xl lg:text-2xl text-gray-600 mb-8 md:mb-10 max-w-2xl mx-auto">
           {lang === "de" 
             ? "Lerne Programmieren, indem du Mauzi vor Pluto schützt!" 
             : "Learn to code by protecting Mauzi from Pluto!"}
         </p>
 
-        <button onClick={onStart} className="bg-[#004284] hover:bg-[#003366] px-16 py-6 rounded-3xl text-3xl font-extrabold shadow-2xl hover:scale-105 transition-all text-white">
+        <button onClick={onStart} className="bg-[#004284] hover:bg-[#003366] px-10 md:px-16 py-4 md:py-6 rounded-3xl text-xl md:text-2xl lg:text-3xl font-extrabold shadow-2xl hover:scale-105 transition-all text-white">
           {t.playNow}
         </button>
       </div>
@@ -275,21 +274,21 @@ const LevelSelect = ({ onSelect, t, onLanguageChange, lang }: {
   onLanguageChange: (l: 'en' | 'de') => void;
   lang: 'en' | 'de'
 }) => (
-  <div className="min-h-screen flex flex-col bg-[#004284]">
+  <div className="min-h-screen flex flex-col bg-[#004284] overflow-y-auto">
     <Header lang={lang} onLanguageChange={onLanguageChange} />
-    <div className="flex-1 flex items-center justify-center p-8">
+    <div className="flex-1 flex items-start justify-center p-4 md:p-8">
       <div className="max-w-6xl w-full">
-        <h2 className="text-5xl font-extrabold text-white text-center mb-4">{t.pickMission}</h2>
-        <p className="text-xl text-blue-100 text-center mb-12">{t.eachMission}</p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white text-center mb-4">{t.pickMission}</h2>
+        <p className="text-base md:text-lg lg:text-xl text-blue-100 text-center mb-8 md:mb-12">{t.eachMission}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {getMissionData(lang).map((m) => (
-            <button key={m.id} onClick={() => onSelect(m.id)} className="bg-white border-2 border-[#004284] hover:border-[#003366] rounded-3xl p-10 text-left hover:shadow-2xl transition-all hover:-translate-y-2">
-              <div className="text-6xl mb-4">{m.level === "easy" ? "🌱" : m.level === "mid" ? "🌿" : "🌳"}</div>
-              <div className="text-sm uppercase tracking-widest text-gray-500 mb-2">
+            <button key={m.id} onClick={() => onSelect(m.id)} className="bg-white border-2 border-[#004284] hover:border-[#003366] rounded-3xl p-6 md:p-10 text-left hover:shadow-2xl transition-all hover:-translate-y-2">
+              <div className="text-5xl md:text-6xl mb-4">{m.level === "easy" ? "🌱" : m.level === "mid" ? "🌿" : "🌳"}</div>
+              <div className="text-xs md:text-sm uppercase tracking-widest text-gray-500 mb-2">
                 {t.levelLabel} {m.level === "easy" ? t.easy : m.level === "mid" ? t.medium : t.hard}
               </div>
-              <div className="text-2xl font-bold text-[#004284] mb-3">{m.title}</div>
-              <div className="text-gray-600">{m.story.substring(0, 80)}...</div>
+              <div className="text-xl md:text-2xl font-bold text-[#004284] mb-3">{m.title}</div>
+              <div className="text-gray-600 text-sm md:text-base">{m.story.substring(0, 80)}...</div>
             </button>
           ))}
         </div>
@@ -298,29 +297,10 @@ const LevelSelect = ({ onSelect, t, onLanguageChange, lang }: {
   </div>
 )
 
-const Console = ({ lines, t }: { lines: ConsoleLine[]; t: any }) => (
-  <div className="bg-gray-50 border-t border-gray-200 p-5">
-    <h4 className="text-sm font-bold text-gray-600 mb-3 flex items-center gap-2">💬 {t.mauziAide}</h4>
-    <div className="font-mono text-sm space-y-1 max-h-32 overflow-y-auto">
-      {lines.length === 0 ? (
-        <div className="text-gray-400">{t.waitingForYou}</div>
-      ) : (
-        lines.map((line, i) => (
-          <div key={i} className={`flex items-center gap-3 ${line.color}`}>
-            <span className="text-gray-400 text-xs">[{line.time}]</span>
-            {line.text}
-          </div>
-        ))
-      )}
-    </div>
-  </div>
-)
-
 const CodeBuilder = ({ 
   mission, 
   program, 
   validation, 
-  consoleLines,
   onAddBlock, 
   onRemoveBlock, 
   onValidate, 
@@ -335,7 +315,7 @@ const CodeBuilder = ({
   const correctSeq = mission.correctSequence
   
   return (
-    <div className="min-h-screen flex flex-col bg-[#004284]">
+    <div className="min-h-screen flex flex-col bg-[#004284] overflow-y-auto">
       <Header lang={lang} onLanguageChange={onLanguageChange} onBack={onReset} />
       
       {/* FRIENDLY ERROR BANNER AT TOP IF THERE'S AN ERROR */}
@@ -349,24 +329,24 @@ const CodeBuilder = ({
         </div>
       )}
 
-      <div className="bg-white/95 backdrop-blur border-b border-gray-200 p-6">
+      <div className="bg-white/95 backdrop-blur border-b border-gray-200 p-4 md:p-6">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-extrabold text-[#004284]">{mission.title}</h1>
-          <p className="text-gray-600">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-[#004284]">{mission.title}</h1>
+          <p className="text-gray-600 text-sm md:text-base">
             {mission.level === "easy" ? t.easy : mission.level === "mid" ? t.medium : t.hard}
           </p>
         </div>
       </div>
 
-      <div className="bg-blue-50 p-6 border-b border-blue-100">
-        <p className="text-xl text-center text-[#004284] max-w-4xl mx-auto">{mission.story}</p>
+      <div className="bg-blue-50 p-4 md:p-6 border-b border-blue-100">
+        <p className="text-lg md:text-xl text-center text-[#004284] max-w-4xl mx-auto">{mission.story}</p>
       </div>
 
-      <div className="flex-1 grid grid-cols-12 gap-6 p-6 max-w-[1800px] mx-auto w-full">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 p-4 md:p-6 max-w-[1800px] mx-auto w-full">
         {/* Left: Available Blocks */}
-        <div className="col-span-3 bg-white rounded-3xl p-6 border border-gray-200 flex flex-col shadow-lg">
-          <h3 className="text-2xl font-bold text-[#004284] mb-6 flex items-center gap-3">🧱 {t.waitActions}</h3>
-          <div className="flex-1 space-y-4">
+        <div className="lg:col-span-3 bg-white rounded-3xl p-4 md:p-6 border border-gray-200 flex flex-col shadow-lg">
+          <h3 className="text-xl md:text-2xl font-bold text-[#004284] mb-4 md:mb-6 flex items-center gap-3">🧱 {t.waitActions}</h3>
+          <div className="flex-1 space-y-3 md:space-y-4 overflow-y-auto max-h-[300px] md:max-h-[600px]">
             {mission.blocks.map((b: Block) => {
               const isAdded = program.includes(b.id)
               const hasError = validation && !validation.valid
@@ -378,7 +358,7 @@ const CodeBuilder = ({
                   onClick={() => isClickable && onAddBlock(b.id)}
                   className={`
                     ${b.color} 
-                    p-5 
+                    p-3 md:p-5 
                     rounded-2xl 
                     border-2 
                     border-transparent
@@ -386,9 +366,9 @@ const CodeBuilder = ({
                     transition-all
                   `}
                 >
-                  <div className="flex items-center gap-4">
-                    <span className="text-4xl">{b.icon}</span>
-                    <span className="text-xl font-bold text-slate-800">{b.label}</span>
+                  <div className="flex items-center gap-3 md:gap-4">
+                    <span className="text-3xl md:text-4xl">{b.icon}</span>
+                    <span className="text-lg md:text-xl font-bold text-slate-800">{b.label}</span>
                   </div>
                 </div>
               )
@@ -396,40 +376,39 @@ const CodeBuilder = ({
           </div>
         </div>
 
-        {/* Middle: Characters & Console */}
-        <div className="col-span-5 bg-white rounded-3xl border border-gray-200 flex flex-col shadow-lg">
-          <div className="flex-1">
+        {/* Middle: Characters */}
+        <div className="lg:col-span-5 bg-white rounded-3xl border border-gray-200 flex flex-col shadow-lg">
+          <div className="flex-1 p-4 md:p-6">
             <CharacterStage mauziState={mauziState} plutoState={plutoState} speech={speech} />
           </div>
-          <Console lines={consoleLines} t={t} />
         </div>
 
         {/* Right: Program */}
-        <div className="col-span-4 bg-white rounded-3xl p-6 border border-gray-200 flex flex-col shadow-lg">
-          <h3 className="text-2xl font-bold text-[#004284] mb-6 flex items-center gap-3">📝 {t.myProgram}</h3>
-          <div className="flex-1 space-y-4 overflow-y-auto max-h-[500px]">
+        <div className="lg:col-span-4 bg-white rounded-3xl p-4 md:p-6 border border-gray-200 flex flex-col shadow-lg">
+          <h3 className="text-xl md:text-2xl font-bold text-[#004284] mb-4 md:mb-6 flex items-center gap-3">📝 {t.myProgram}</h3>
+          <div className="flex-1 space-y-3 md:space-y-4 overflow-y-auto max-h-[300px] md:max-h-[500px]">
             {program.map((id: string, index: number) => {
               const block = mission.blocks.find((b: Block) => b.id === id)
               const isCorrect = index < correctSeq.length && id === correctSeq[index]
               const isWrong = validation && !validation.valid && index === validation.wrongIndex
               
               return (
-                <div key={index} className="flex items-center gap-4">
-                  <div className="text-2xl font-bold text-gray-400 w-10 text-center">{index + 1}.</div>
+                <div key={index} className="flex items-center gap-3 md:gap-4">
+                  <div className="text-xl md:text-2xl font-bold text-gray-400 w-8 md:w-10 text-center">{index + 1}.</div>
                   <div className={`
                     flex-1 
                     ${block.color} 
-                    p-5 
+                    p-3 md:p-5 
                     rounded-2xl 
                     border-4 
                     ${isCorrect ? "border-green-500" : isWrong ? "border-red-500 animate-wiggle" : "border-transparent"} 
-                    flex items-center gap-4 text-slate-800
+                    flex items-center gap-3 md:gap-4 text-slate-800
                   `}>
-                    <span className="text-4xl">{block.icon}</span>
-                    <span className="text-xl font-bold">{block.label}</span>
+                    <span className="text-3xl md:text-4xl">{block.icon}</span>
+                    <span className="text-lg md:text-xl font-bold">{block.label}</span>
                     <button 
                       onClick={() => onRemoveBlock(index)} 
-                      className="ml-auto text-3xl hover:scale-125 transition-all text-red-700"
+                      className="ml-auto text-2xl md:text-3xl hover:scale-125 transition-all text-red-700"
                     >
                       ×
                     </button>
@@ -438,9 +417,9 @@ const CodeBuilder = ({
               )
             })}
             {[...Array(Math.max(0, correctSeq.length - program.length))].map((_, emptyIndex) => (
-              <div key={`empty-${emptyIndex}`} className="flex items-center gap-4">
-                <div className="text-2xl font-bold text-gray-400 w-10 text-center">{program.length + emptyIndex + 1}.</div>
-                <div className="flex-1 bg-gray-100 border-2 border-dashed border-gray-300 p-5 rounded-2xl text-center text-gray-400">
+              <div key={`empty-${emptyIndex}`} className="flex items-center gap-3 md:gap-4">
+                <div className="text-xl md:text-2xl font-bold text-gray-400 w-8 md:w-10 text-center">{program.length + emptyIndex + 1}.</div>
+                <div className="flex-1 bg-gray-100 border-2 border-dashed border-gray-300 p-3 md:p-5 rounded-2xl text-center text-gray-400">
                   ?
                 </div>
               </div>
@@ -451,11 +430,11 @@ const CodeBuilder = ({
             onClick={onValidate} 
             disabled={program.length === 0 || (validation && !validation.valid)} 
             className={`
-              mt-6 
+              mt-4 md:mt-6 
               w-full 
-              py-5 
+              py-4 md:py-5 
               rounded-2xl 
-              text-2xl 
+              text-xl md:text-2xl 
               font-bold 
               transition-all 
               ${program.length === 0 || (validation && !validation.valid) 
@@ -473,30 +452,30 @@ const CodeBuilder = ({
 }
 
 const HardwareReady = ({ mission, onStart, t, onLanguageChange, lang }: { mission: any; onStart: () => void; t: any; onLanguageChange: (l: 'en' | 'de') => void; lang: 'en' | 'de' }) => (
-  <div className="min-h-screen flex flex-col bg-[#004284]">
+  <div className="min-h-screen flex flex-col bg-[#004284] overflow-y-auto">
     <Header lang={lang} onLanguageChange={onLanguageChange} />
-    <div className="flex-1 flex items-center justify-center p-8">
-      <div className="max-w-4xl w-full text-center bg-white rounded-3xl p-12 shadow-2xl">
-        <div className="text-9xl mb-8 animate-bounce">🎉</div>
-        <h2 className="text-5xl font-extrabold mb-6 text-green-600">{t.programPerfect}</h2>
-        <p className="text-2xl text-gray-600 mb-10">{t.nowLegoCanGo}</p>
+    <div className="flex-1 flex items-center justify-center p-4 md:p-8">
+      <div className="max-w-4xl w-full text-center bg-white rounded-3xl p-8 md:p-12 shadow-2xl">
+        <div className="text-6xl md:text-9xl mb-6 md:mb-8 animate-bounce">🎉</div>
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4 md:mb-6 text-green-600">{t.programPerfect}</h2>
+        <p className="text-lg md:text-xl lg:text-2xl text-gray-600 mb-8 md:mb-10">{t.nowLegoCanGo}</p>
         
-        <div className="bg-gray-50 rounded-3xl p-8 border border-green-200 mb-10">
-          <h3 className="text-2xl font-bold mb-6 text-[#004284]">🗺️ {t.parkourMission}</h3>
-          <div className="flex items-center justify-center gap-4 flex-wrap">
+        <div className="bg-gray-50 rounded-3xl p-6 md:p-8 border border-green-200 mb-8 md:mb-10">
+          <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#004284]">🗺️ {t.parkourMission}</h3>
+          <div className="flex items-center justify-center gap-2 md:gap-4 flex-wrap">
             {mission.hardwareMission.map((s: any, i: number) => (
-              <div key={s.id} className="flex items-center gap-4">
-                <div className="bg-white px-6 py-4 rounded-2xl border border-gray-300 shadow-sm">
-                  <div className="text-2xl">📍</div>
-                  <div className="font-bold text-gray-800">{s.label}</div>
+              <div key={s.id} className="flex items-center gap-2 md:gap-4">
+                <div className="bg-white px-4 md:px-6 py-3 md:py-4 rounded-2xl border border-gray-300 shadow-sm">
+                  <div className="text-xl md:text-2xl">📍</div>
+                  <div className="font-bold text-gray-800 text-sm md:text-base">{s.label}</div>
                 </div>
-                {i < mission.hardwareMission.length - 1 && <div className="text-3xl text-gray-400">→</div>}
+                {i < mission.hardwareMission.length - 1 && <div className="text-2xl md:text-3xl text-gray-400">→</div>}
               </div>
             ))}
           </div>
         </div>
 
-        <button onClick={onStart} className="bg-[#004284] hover:bg-[#003366] px-16 py-6 rounded-3xl text-3xl font-extrabold shadow-2xl hover:scale-105 transition-all text-white">
+        <button onClick={onStart} className="bg-[#004284] hover:bg-[#003366] px-10 md:px-16 py-4 md:py-6 rounded-3xl text-xl md:text-2xl lg:text-3xl font-extrabold shadow-2xl hover:scale-105 transition-all text-white">
           🚗 {t.parkourStart}
         </button>
       </div>
@@ -505,38 +484,38 @@ const HardwareReady = ({ mission, onStart, t, onLanguageChange, lang }: { missio
 )
 
 const HardwareRunning = ({ mission, hardwareSteps, onSimulate, onReset, t, onLanguageChange, lang }: any) => (
-  <div className="min-h-screen flex flex-col bg-[#004284]">
+  <div className="min-h-screen flex flex-col bg-[#004284] overflow-y-auto">
     <Header lang={lang} onLanguageChange={onLanguageChange} onBack={onReset} />
-    <div className="bg-white/95 backdrop-blur border-b border-gray-200 p-6 text-center">
-      <h2 className="text-5xl font-extrabold text-[#004284]">🏁 {t.parkourRunning}</h2>
-      <p className="text-xl text-gray-600 mt-2">{t.legosOnWay}</p>
+    <div className="bg-white/95 backdrop-blur border-b border-gray-200 p-4 md:p-6 text-center">
+      <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#004284]">🏁 {t.parkourRunning}</h2>
+      <p className="text-base md:text-lg lg:text-xl text-gray-600 mt-2">{t.legosOnWay}</p>
     </div>
-    <div className="flex-1 flex items-center justify-center p-8">
+    <div className="flex-1 flex items-center justify-center p-4 md:p-8">
       <div className="max-w-5xl w-full">
-        <div className="flex items-center justify-center gap-8 flex-wrap mb-12">
-          <div className="text-8xl animate-bounce">🚗</div>
-          <div className="text-5xl text-blue-200">→</div>
-          <div className="text-8xl animate-pulse">🚗</div>
+        <div className="flex items-center justify-center gap-4 md:gap-8 flex-wrap mb-8 md:mb-12">
+          <div className="text-5xl md:text-6xl lg:text-8xl animate-bounce">🚗</div>
+          <div className="text-3xl md:text-4xl lg:text-5xl text-blue-200">→</div>
+          <div className="text-5xl md:text-6xl lg:text-8xl animate-pulse">🚗</div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
           {hardwareSteps.map((s: HardwareStep) => {
             const colorClass = s.status === "success" ? "bg-green-50 border-green-500" : s.status === "active" ? "bg-blue-50 border-[#004284]" : "bg-white border-gray-200"
             const textClass = s.status === "success" ? "text-green-800" : s.status === "active" ? "text-[#004284]" : "text-gray-800"
             return (
-              <div key={s.id} className={`${colorClass} border-2 rounded-3xl p-6 text-center shadow-sm`}>
-                <div className="text-5xl mb-4">{s.status === "success" ? "✅" : s.status === "active" ? "🟡" : "⚪"}</div>
-                <div className={`text-xl font-bold ${textClass}`}>{s.label}</div>
+              <div key={s.id} className={`${colorClass} border-2 rounded-3xl p-4 md:p-6 text-center shadow-sm`}>
+                <div className="text-4xl md:text-5xl mb-3 md:mb-4">{s.status === "success" ? "✅" : s.status === "active" ? "🟡" : "⚪"}</div>
+                <div className={`text-base md:text-lg lg:text-xl font-bold ${textClass}`}>{s.label}</div>
               </div>
             )
           })}
         </div>
 
-        <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-lg">
-          <h3 className="text-2xl font-bold mb-6 text-center text-[#004284]">🔧 {t.testUs}</h3>
-          <div className="flex flex-wrap gap-4 justify-center">
+        <div className="bg-white rounded-3xl p-6 md:p-8 border border-gray-200 shadow-lg">
+          <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center text-[#004284]">🔧 {t.testUs}</h3>
+          <div className="flex flex-wrap gap-3 md:gap-4 justify-center">
             {mission.hardwareMission.map((s: any) => (
-              <button key={s.id} onClick={() => onSimulate(s.sensor)} className="bg-[#004284] hover:bg-[#003366] px-6 py-4 rounded-2xl font-bold text-white transition-all hover:scale-105 shadow-md">
+              <button key={s.id} onClick={() => onSimulate(s.sensor)} className="bg-[#004284] hover:bg-[#003366] px-4 md:px-6 py-3 md:py-4 rounded-2xl font-bold text-white transition-all hover:scale-105 shadow-md">
                 {s.label}
               </button>
             ))}
@@ -548,21 +527,21 @@ const HardwareRunning = ({ mission, hardwareSteps, onSimulate, onReset, t, onLan
 )
 
 const Success = ({ onAgain, onAnother, t, onLanguageChange, lang }: { onAgain: () => void; onAnother: () => void; t: any; onLanguageChange: (l: 'en' | 'de') => void; lang: 'en' | 'de' }) => (
-  <div className="min-h-screen flex flex-col bg-[#004284]">
+  <div className="min-h-screen flex flex-col bg-[#004284] overflow-y-auto">
     <Header lang={lang} onLanguageChange={onLanguageChange} />
-    <div className="flex-1 flex items-center justify-center p-8">
-      <div className="max-w-4xl w-full text-center bg-white rounded-3xl p-12 shadow-2xl">
-        <div className="flex justify-center items-end gap-12 mb-8">
-          <img src={plutoImages.retreating} alt="Pluto" className="w-40 h-40 object-contain animate-pulse" style={{ animationDuration: "3s" }} />
-          <img src={mauziImages.waving} alt="Mauzi" className="w-40 h-40 object-contain animate-bounce" style={{ animationDuration: "2s" }} />
+    <div className="flex-1 flex items-center justify-center p-4 md:p-8">
+      <div className="max-w-4xl w-full text-center bg-white rounded-3xl p-8 md:p-12 shadow-2xl">
+        <div className="flex justify-center items-end gap-6 md:gap-12 mb-6 md:mb-8">
+          <img src={plutoImages.retreating} alt="Pluto" className="w-24 h-24 md:w-32 lg:w-40 h-auto object-contain animate-pulse" style={{ animationDuration: "3s" }} />
+          <img src={mauziImages.waving} alt="Mauzi" className="w-24 h-24 md:w-32 lg:w-40 h-auto object-contain animate-bounce" style={{ animationDuration: "2s" }} />
         </div>
-        <h2 className="text-6xl font-extrabold text-green-600 mb-6">{t.mauziSafe}</h2>
-        <p className="text-2xl text-gray-600 mb-12">{t.youDidIt}</p>
-        <div className="flex flex-wrap gap-4 justify-center">
-          <button onClick={onAgain} className="bg-[#004284] hover:bg-[#003366] px-12 py-5 rounded-3xl text-2xl font-extrabold shadow-2xl hover:scale-105 transition-all text-white">
+        <h2 className="text-3xl md:text-4xl lg:text-6xl font-extrabold text-green-600 mb-4 md:mb-6">{t.mauziSafe}</h2>
+        <p className="text-lg md:text-xl lg:text-2xl text-gray-600 mb-8 md:mb-12">{t.youDidIt}</p>
+        <div className="flex flex-wrap gap-3 md:gap-4 justify-center">
+          <button onClick={onAgain} className="bg-[#004284] hover:bg-[#003366] px-8 md:px-12 py-3 md:py-5 rounded-3xl text-xl md:text-2xl font-extrabold shadow-2xl hover:scale-105 transition-all text-white">
             {t.again}
           </button>
-          <button onClick={onAnother} className="bg-gray-200 hover:bg-gray-300 px-12 py-5 rounded-3xl text-2xl font-extrabold shadow-xl hover:scale-105 transition-all text-gray-800">
+          <button onClick={onAnother} className="bg-gray-200 hover:bg-gray-300 px-8 md:px-12 py-3 md:py-5 rounded-3xl text-xl md:text-2xl font-extrabold shadow-xl hover:scale-105 transition-all text-gray-800">
             {t.otherMission}
           </button>
         </div>
@@ -579,7 +558,6 @@ const App = () => {
   const [validation, setValidation] = useState<{ valid: boolean; wrongIndex: number; message: string } | null>(null)
   const [hardwareSteps, setHardwareSteps] = useState<HardwareStep[]>([])
   const [currentHardwareStepIndex, setCurrentHardwareStepIndex] = useState(0)
-  const [consoleLines, setConsoleLines] = useState<ConsoleLine[]>([])
   const [mauziState, setMauziState] = useState<MauziState>('sleeping')
   const [plutoState, setPlutoState] = useState<PlutoState>('sneaking')
   const [speech, setSpeech] = useState<string>('Mauzi schläft noch…')
@@ -628,12 +606,6 @@ const App = () => {
   }, [phase, t]);
 
   // --- HELPERS ---
-  const addConsoleLine = (text: string, type: "info" | "success" | "error" = "info") => {
-    const colors = { info: "text-cyan-300", success: "text-green-400", error: "text-red-400" }
-    const locale = lang === 'de' ? 'de-DE' : 'en-US'
-    const newLine: ConsoleLine = { text, color: colors[type], time: new Date().toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" }) }
-    setConsoleLines(prev => [...prev, newLine])
-  }
 
   const playCharacterReaction = (actionId: string) => {
     switch (actionId) {
@@ -682,7 +654,6 @@ const App = () => {
   const handleWebSocketMessage = (msg: any) => {
     switch (msg.type) {
       case "HARDWARE_STEP_SUCCESS":
-        addConsoleLine(`✅ ${t.successParkourDone}`, "success");
         if (currentMission) {
           setHardwareSteps(prev => {
             const newSteps = [...prev];
@@ -699,12 +670,10 @@ const App = () => {
         }
         break;
       case "HARDWARE_SUCCESS":
-        addConsoleLine(`🏆 ${t.successParkourDone}`, "success");
         setTimeout(() => setPhase("success"), 1000);
         break;
       case "HARDWARE_ERROR":
       case "HARDWARE_WRONG_PATH":
-        addConsoleLine(`❌ ${msg.message}`, "error");
         break;
     }
   }
@@ -714,7 +683,6 @@ const App = () => {
     setLang(newLang)
     setProgram([])
     setValidation(null)
-    setConsoleLines([])
   }
 
   // --- ACTIONS ---
@@ -724,12 +692,10 @@ const App = () => {
     setCurrentMissionId(id)
     setProgram([])
     setValidation(null)
-    setConsoleLines([])
     setMauziState('sleeping')
     setPlutoState('sneaking')
     setSpeech('Mauzi schläft noch…')
     setPhase("code-builder")
-    addConsoleLine(`🎯 ${t.missionStart}`, "info")
   }
 
   const addBlock = (id: string) => {
@@ -746,7 +712,6 @@ const App = () => {
         if (index < correctSeq.length && newProgram[index] !== correctSeq[index]) {
           const message = (currentMission.hints as Hints)[correctSeq[index]]
           setValidation({ valid: false, wrongIndex: index, message })
-          addConsoleLine(`❌ ${t.oops} ${message}`, "error")
           setMauziState('confused')
           setPlutoState('genervt')
           setSpeech(message)
@@ -754,7 +719,6 @@ const App = () => {
           setValidation(null)
           const block = currentMission.blocks.find(b => b.id === id)
           if (block) {
-            addConsoleLine(`➕ ${t.actionAdded} ${block.label}`, "info")
             playCharacterReaction(id)
           }
         }
@@ -763,13 +727,9 @@ const App = () => {
   }
 
   const removeBlock = (index: number) => {
-    const block = currentMission?.blocks.find(b => b.id === program[index])
     const newProgram = program.filter((_, i) => i !== index)
     setProgram(newProgram)
     setValidation(null)
-    if (block) {
-      addConsoleLine(`➖ ${t.actionRemoved} ${block.label}`, "info")
-    }
     // Reset states based on remaining program
     if (newProgram.length === 0) {
       setMauziState('sleeping')
@@ -802,7 +762,6 @@ const App = () => {
 
       if (result.success) {
         setValidation({ valid: true, wrongIndex: -1, message: "Super!" });
-        addConsoleLine(`✅ ${t.successParkourDone}`, "success");
         setTimeout(() => {
           setHardwareSteps(currentMission.hardwareMission.map((s, i) => ({ ...s, status: i === 0 ? "active" : "pending" })));
           setCurrentHardwareStepIndex(0);
@@ -812,7 +771,6 @@ const App = () => {
         const wrongIndex = result.steps?.findIndex((s: any) => !s.success) ?? program.length;
         const message = result.steps?.[wrongIndex]?.message || result.errors?.[0] || "Fehler!";
         setValidation({ valid: false, wrongIndex, message });
-        addConsoleLine(`❌ ${t.oops} ${message}`, "error");
         setMauziState('confused');
         setPlutoState('genervt');
         setSpeech(message);
@@ -834,7 +792,6 @@ const App = () => {
       if (program[i] !== correctSeq[i]) {
         const message = (currentMission.hints as Hints)[correctSeq[i]];
         setValidation({ valid: false, wrongIndex: i, message });
-        addConsoleLine(`❌ ${t.oops} ${message}`, "error");
         setMauziState('confused');
         setPlutoState('genervt');
         setSpeech(message);
@@ -845,7 +802,6 @@ const App = () => {
     if (program.length < correctSeq.length) {
       const message = lang === 'de' ? "Es fehlt noch mindestens eine Aktion!" : "At least one action is still missing!";
       setValidation({ valid: false, wrongIndex: program.length, message });
-      addConsoleLine(`⚠️ ${message}`, "error");
       setMauziState('confused');
       setPlutoState('genervt');
       setSpeech(message);
@@ -853,7 +809,6 @@ const App = () => {
     }
 
     setValidation({ valid: true, wrongIndex: -1, message: "Super!" });
-    addConsoleLine(`✅ ${t.successParkourDone}`, "success");
     
     setTimeout(() => {
       setHardwareSteps(currentMission.hardwareMission.map((s, i) => ({ ...s, status: i === 0 ? "active" : "pending" })));
@@ -880,7 +835,6 @@ const App = () => {
     }
 
     setPhase("hardware-running");
-    addConsoleLine(`🚗 ${t.parkourStart}`, "info");
   };
 
   const simulateHardwareStep = (sensorId: string) => {
@@ -890,7 +844,6 @@ const App = () => {
     if (currentStep.sensor === sensorId) {
       const newSteps = [...hardwareSteps]
       newSteps[currentHardwareStepIndex].status = "success"
-      addConsoleLine(`✅ ${t.successParkourDone}`, "success")
 
       if (currentHardwareStepIndex < currentMission.hardwareMission.length - 1) {
         newSteps[currentHardwareStepIndex + 1].status = "active"
@@ -899,12 +852,9 @@ const App = () => {
       } else {
         setHardwareSteps(newSteps)
         setTimeout(() => {
-          addConsoleLine(`🏆 ${t.successParkourDone}`, "success")
           setPhase("success")
         }, 1000)
       }
-    } else {
-      addConsoleLine(`❌ ${t.errorWrongPath} ${currentStep.label}`, "error")
     }
   }
 
@@ -915,7 +865,6 @@ const App = () => {
     setValidation(null)
     setHardwareSteps([])
     setCurrentHardwareStepIndex(0)
-    setConsoleLines([])
   }
 
   // --- RENDER ---
@@ -927,7 +876,6 @@ const App = () => {
         mission={currentMission}
         program={program}
         validation={validation}
-        consoleLines={consoleLines}
         onAddBlock={addBlock}
         onRemoveBlock={removeBlock}
         onValidate={validateProgram}
@@ -959,7 +907,6 @@ const App = () => {
           setPhase("level-select")
           setProgram([])
           setValidation(null)
-          setConsoleLines([])
           setMauziState("sleeping")
           setPlutoState("sneaking")
           setSpeech("Mauzi schläft noch…")

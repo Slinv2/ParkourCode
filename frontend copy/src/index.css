@@ -4,17 +4,17 @@
 
 /* Gentle wiggle for wrong blocks - not too intense! */
 @keyframes gentleWiggle {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-3px); }
-    75% { transform: translateX(3px); }
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
 }
 .animate-wiggle { 
-    animation: gentleWiggle 0.5s ease-in-out;
-    animation-iteration-count: 3; /* just 3 wiggles then stop */
+  animation: gentleWiggle 0.5s ease-in-out;
+  animation-iteration-count: 3; /* just 3 wiggles then stop */
 }
 
 @layer base {
-  body {
-    @apply text-white;
+  body, html, #root {
+    @apply h-auto min-h-screen text-white overflow-y-auto;
   }
 }
