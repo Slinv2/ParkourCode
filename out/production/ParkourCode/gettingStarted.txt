@@ -1,9 +1,9 @@
 Anleitung die Hardware anzuschließen:
 1. Den Raspberry Pi per Lan Kabel
 2. Stromverbindung herstellen Pi
-3. Connection per Terminal 
-4. Skript starten 
-
+3. Connection per Terminal
+4.1 Java Server starten
+4.2 Python Skript starten 
 
 Raspberry PI5 Befehle 
 
@@ -16,7 +16,7 @@ arp -a
 sudo shutdown -h now
 
 Ressourcen auf den PI 5 laden:
-scp "C:\Users\niv\OneDrive - abat AG\Desktop\PJ2\ParkourCode.py" parkourcode@192.168.137.10:/home/parkourcode/
+scp "C:\Users\niv\OneDrive - abat AG\Desktop\PJ2\ParkourCode\Backend\ParkourCode.py" parkourcode@192.168.137.10:/home/parkourcode/
 
 Passwort und name:
 parkourcode
@@ -25,6 +25,11 @@ cd /home/parkourcode/
 
 Skript starten:
 python3 /home/parkourcode/ParkourCode.py
+
+Java starten:
+cd Backend
+javac Server.java #kompilieren
+java Server #startenjava
 
 WICHTIG! 
 mit arp -a lässt sich die IP des raspberry pi herausfinden und muss in die entsprechenden Befehle gegebenenfalls eingefügt werden

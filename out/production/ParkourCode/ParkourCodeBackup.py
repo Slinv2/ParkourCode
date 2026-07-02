@@ -18,8 +18,6 @@ GPIO.setup(PIN_TASTER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 PIN_LDR = 29
 GPIO.setup(PIN_LDR, GPIO.IN)
 
-# -------------------------
-
 try:
     print("Messung gestartet... Drücke STRG+C zum Beenden.")
     while True:

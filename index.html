@@ -259,6 +259,64 @@
         let consoleLines = [];
         let missions = getMissionData(currentLanguage);
 
+        // --- WEBOSCKET VERBINDUNG ---
+        const socket = new WebSocket("ws://localhost:8080");
+
+        socket.onopen = function(e) {
+            console.log("Erfolgreich mit Java-WebSocket verbunden!");
+        };
+
+        // Empfängt die JSON-Daten von Java
+        socket.onmessage = function(event) {
+            if (phase !== "hardware-running") return;
+
+            // Parsen der JSON-Booleans vom Java-backend.main.Server
+            const data = JSON.parse(event.data);
+            console.log("Echte Hardware-Daten empfangen:", data);
+
+            // Trigger-Logik Sensoren im Parcours:
+            if (data.schalter === true) {
+                checkAndTriggerHardwareStep("button-a");
+            }
+            if (data.taster === true) {
+                checkAndTriggerHardwareStep("gewicht");
+            }
+            if (data.licht === true) {
+                checkAndTriggerHardwareStep("licht");
+            }
+        };
+
+        socket.onerror = function(error) {
+            console.error(`WebSocket-Fehler: ${error.message}`);
+        };
+
+        function checkAndTriggerHardwareStep(sensorId) {
+            if (phase !== "hardware-running") return;
+
+            const mission = getCurrentMission();
+            if (!mission) return;
+            const currentStep = hardwareSteps[currentHardwareStepIndex];
+            const t = translations[currentLanguage];
+
+            if (currentStep.sensor === sensorId && currentStep.status !== "success") {
+                hardwareSteps = [...hardwareSteps];
+                hardwareSteps[currentHardwareStepIndex].status = "success";
+                addConsoleLine(t.successParkourDone.split(".")[0], "success");
+
+                if (currentHardwareStepIndex < mission.hardwareMission.length - 1) {
+                    hardwareSteps[currentHardwareStepIndex + 1].status = "active";
+                    currentHardwareStepIndex++;
+                } else {
+                    setTimeout(() => {
+                        addConsoleLine(t.mauziSafe, "success");
+                        phase = "success";
+                        render();
+                    }, 1000);
+                }
+                render();
+            }
+        }
+
         // --- FUNCTIONS ---
         function setLanguage(lang) {
             currentLanguage = lang;
@@ -377,30 +435,7 @@
         }
 
         function simulateHardwareStep(sensorId) {
-            const mission = getCurrentMission();
-            if (!mission) return;
-            const currentStep = hardwareSteps[currentHardwareStepIndex];
-            const t = translations[currentLanguage];
-
-            if (currentStep.sensor === sensorId) {
-                hardwareSteps = [...hardwareSteps];
-                hardwareSteps[currentHardwareStepIndex].status = "success";
-                addConsoleLine(t.successParkourDone.split(".")[0], "success");
-                
-                if (currentHardwareStepIndex < mission.hardwareMission.length - 1) {
-                    hardwareSteps[currentHardwareStepIndex + 1].status = "active";
-                    currentHardwareStepIndex++;
-                } else {
-                    setTimeout(() => {
-                        addConsoleLine(t.mauziSafe, "success");
-                        phase = "success";
-                        render();
-                    }, 1000);
-                }
-            } else {
-                addConsoleLine(`${t.errorWrongPath} ${currentStep.label}`, "error");
-            }
-            render();
+            checkAndTriggerHardwareStep(sensorId);
         }
 
         function resetGame() {
